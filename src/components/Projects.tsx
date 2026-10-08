@@ -15,6 +15,32 @@ interface Project {
 const PROJECTS: Project[] = [
   {
     number: '01',
+    title: 'Great Old Broads for Wilderness – Enterprise Platform & Custom UX/UI Design System',
+    clientType: 'National Conservation Non-Profit (US)',
+    highlightMetric: 'Custom UX/UI Design System · 20+ Native Gutenberg Blocks · Monorepo',
+    description:
+      'Engineered an enterprise-grade digital platform and a 100% bespoke UX/UI design system for Great Old Broads for Wilderness, a prominent US women-led grassroots conservation non-profit. Replaced bulky third-party page builders with 20+ native custom Gutenberg blocks (React + PHP SSR), delivering 1:1 visual parity between the WordPress editor and frontend, frictionless donation funnels, and sub-second Core Web Vitals.',
+    architecturePoints: [
+      'Bespoke UX/UI Design System: Proprietary design tokens (broads-purple, coral, sunshine), Geist & Inter typography, and conversion-optimized donation & grassroots advocacy funnels.',
+      '20+ Native Custom Gutenberg Blocks: Hybrid architecture coupling React/JSX block editors with PHP SSR classes (GreatOldBroads_Abstract_Block) for semantic, zero-bloat HTML output.',
+      '1:1 Visual Parity (Editor vs. Frontend): What content teams construct in the React editor matches the live public experience pixel-for-pixel, eliminating layout surprises.',
+      'Modular Monorepo Architecture: Strict separation of concerns segregating theme presentation, decoupled portable custom-plugins, mu-plugins, and Docker Compose local orchestration.',
+    ],
+    stack: [
+      'WordPress',
+      'PHP 8.3 OOP',
+      'React',
+      'Gutenberg API',
+      'Tailwind CSS 3.4',
+      'esbuild',
+      'Lucide Icons',
+      'Docker Compose',
+      'MariaDB 11.4',
+    ],
+    urlLabel: 'Under Construction',
+  },
+  {
+    number: '02',
     title: 'AT3 Tactical – Custom Enterprise Ecommerce Engine & 14 Bespoke Plugins',
     clientType: 'AT3 Tactical · High-Volume Technical Commerce',
     highlightMetric: '$45M+ Lifetime GMV · Bespoke Theme · 14 Custom Plugins',
@@ -41,33 +67,6 @@ const PROJECTS: Project[] = [
     ],
     url: 'https://www.at3tactical.com',
     urlLabel: 'Visit Storefront',
-  },
-  {
-    number: '02',
-    title: 'Great Old Broads for Wilderness – Enterprise Platform & Custom UX/UI Design System',
-    clientType: 'National Conservation Non-Profit (US)',
-    highlightMetric: 'Custom UX/UI Design System · 20+ Native Gutenberg Blocks · Monorepo',
-    description:
-      'Engineered an enterprise-grade digital platform and a 100% bespoke UX/UI design system for Great Old Broads for Wilderness, a prominent US women-led grassroots conservation non-profit. Replaced bulky third-party page builders with 20+ native custom Gutenberg blocks (React + PHP SSR), delivering 1:1 visual parity between the WordPress editor and frontend, frictionless donation funnels, and sub-second Core Web Vitals.',
-    architecturePoints: [
-      'Bespoke UX/UI Design System: Proprietary design tokens (broads-purple, coral, sunshine), Geist & Inter typography, and conversion-optimized donation & grassroots advocacy funnels.',
-      '20+ Native Custom Gutenberg Blocks: Hybrid architecture coupling React/JSX block editors with PHP SSR classes (GreatOldBroads_Abstract_Block) for semantic, zero-bloat HTML output.',
-      '1:1 Visual Parity (Editor vs. Frontend): What content teams construct in the React editor matches the live public experience pixel-for-pixel, eliminating layout surprises.',
-      'Modular Monorepo Architecture: Strict separation of concerns segregating theme presentation, decoupled portable custom-plugins, mu-plugins, and Docker Compose local orchestration.',
-    ],
-    stack: [
-      'WordPress',
-      'PHP 8.3 OOP',
-      'React',
-      'Gutenberg API',
-      'Tailwind CSS 3.4',
-      'esbuild',
-      'Lucide Icons',
-      'Docker Compose',
-      'MariaDB 11.4',
-    ],
-    url: 'https://www.greatoldbroads.org',
-    urlLabel: 'Visit Live Platform',
   },
   {
     number: '03',
@@ -211,8 +210,17 @@ export const Projects: React.FC = () => {
                       </a>
                     ) : (
                       proj.urlLabel && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 text-ink-muted border border-ink/10 ml-1">
-                          {proj.urlLabel}
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border ml-1 ${
+                            proj.urlLabel.toLowerCase().includes('construction')
+                              ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
+                              : 'bg-ink/5 text-ink-muted border-ink/10'
+                          }`}
+                        >
+                          {proj.urlLabel.toLowerCase().includes('construction') && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                          )}
+                          <span>{proj.urlLabel}</span>
                         </span>
                       )
                     )}
