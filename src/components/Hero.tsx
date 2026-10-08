@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import cvPdf from '../assets/docs/cv.pdf';
+import { HeroPhone } from './HeroPhone';
 
 interface HeroProps {
   onExploreClick?: () => void;
@@ -86,78 +87,13 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
         </span>
       </div>
 
-      {/* 2. Central Media Area — Designed for Future Hero Video */}
-      <div
-        className="hidden lg:flex absolute top-1/2 right-6 lg:right-[10%] xl:right-[15%] 2xl:right-[18%] -translate-y-1/2 w-[320px] lg:w-[360px] xl:w-[400px] h-[48vh] lg:h-[52vh] max-h-[540px] pointer-events-none z-10 items-center justify-center"
-      >
-        {/*
-          ======================================================================
-          FUTURE HERO VIDEO COMPONENT SLOT:
-          When your video asset is ready, replace the inner placeholder with:
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            src="/path-to-your-video.mp4"
-            className="w-full h-full object-cover object-center rounded-2xl shadow-2xl"
-          />
-          ======================================================================
-        */}
+      {/* 2. Central Media Area — iPhone 17 Showcase with 16:9 Video & Big Play Button */}
+      <div className="hidden lg:flex absolute top-1/2 right-6 lg:right-[8%] xl:right-[12%] 2xl:right-[15%] -translate-y-1/2 z-20 items-center justify-center pointer-events-auto">
         <div
           ref={mediaContainerRef}
-          className="relative w-full h-full rounded-2xl border border-ink/10 bg-gradient-to-b from-warm-100/90 via-warm-200/50 to-warm-100/80 backdrop-blur-sm overflow-hidden flex flex-col justify-between p-6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.08)]"
+          className="relative h-[440px] lg:h-[490px] xl:h-[540px] 2xl:h-[580px]"
         >
-          {/* Subtle Viewfinder / Editorial Crop Marks */}
-          <div className="flex justify-between items-start">
-            <span className="font-mono text-[10px] tracking-widest text-ink-muted uppercase flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-accent/80 animate-pulse" />
-              SLOT · HERO FIGURE // 01
-            </span>
-            <span className="font-mono text-[9px] text-ink-light">LIMA, PE</span>
-          </div>
-
-          {/* Central Tasteful Silhouette / Architectural Wireframe Placeholder */}
-          <div className="relative my-auto flex flex-col items-center justify-center text-center px-4">
-            {/* Elegant Minimalist Human Silhouette Contour */}
-            <div className="relative w-32 h-44 mb-3 opacity-25 flex items-center justify-center">
-              <svg
-                viewBox="0 0 100 160"
-                className="w-full h-full stroke-ink fill-none"
-                strokeWidth="1.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {/* Minimal editorial standing silhouette contour */}
-                <circle cx="50" cy="24" r="14" strokeDasharray="3 2" />
-                <path d="M50 38 L50 48" />
-                <path d="M30 52 C36 48, 64 48, 70 52 L78 94 C76 98, 68 98, 66 94 L62 68 L62 136 L52 136 L50 96 L48 136 L38 136 L38 68 L34 94 C32 98, 24 98, 22 94 Z" />
-              </svg>
-            </div>
-
-            <p className="font-mono text-[11px] tracking-wider text-ink-muted uppercase">
-              Standing Video Area
-            </p>
-            <p className="font-sans text-[11px] text-ink-light max-w-[200px] mt-1">
-              Prepared for high-framerate standing video loop
-            </p>
-          </div>
-
-          {/* Bottom metadata tags */}
-          <div className="flex justify-between items-end border-t border-ink/5 pt-3">
-            <span className="font-mono text-[9px] text-ink-light tracking-wider">
-              15+ YRS EXP
-            </span>
-            <span className="font-mono text-[9px] text-ink-light tracking-wider">
-              ECOMMERCE ARCHITECTURE
-            </span>
-          </div>
-
-          {/* Corner frame ticks */}
-          <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-ink/20" />
-          <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-ink/20" />
-          <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-ink/20" />
-          <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-ink/20" />
+          <HeroPhone className="h-full w-auto" />
         </div>
       </div>
 
