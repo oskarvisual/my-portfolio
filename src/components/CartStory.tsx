@@ -127,9 +127,9 @@ export const CartStory: React.FC = () => {
           1.5
         );
       } else {
-        // Desktop: Cart firmly anchored on the left, normal scale; floor at normal scale
+        // Desktop: Cart centered in left column, normal scale; floor at normal scale
         gsap.set(cartWrapperRef.current, {
-          xPercent: 0,
+          xPercent: -50,
           scale: 1.0,
           clearProps: 'transformOrigin',
         });
@@ -368,7 +368,7 @@ export const CartStory: React.FC = () => {
         {/* ================================================================= */}
         <div
           ref={cartWrapperRef}
-          className="absolute left-1/2 md:left-4 lg:left-8 xl:left-14 bottom-0 z-20 will-change-transform drop-shadow-[0_20px_45px_rgba(0,0,0,0.22)] select-none pointer-events-auto"
+          className="absolute left-1/2 md:left-[24%] lg:left-[23%] xl:left-[22.5%] bottom-0 z-20 will-change-transform drop-shadow-[0_20px_45px_rgba(0,0,0,0.22)] select-none pointer-events-auto"
           style={{
             backfaceVisibility: 'hidden',
           }}
