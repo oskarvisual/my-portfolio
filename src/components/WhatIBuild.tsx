@@ -135,6 +135,8 @@ export const WhatIBuild: React.FC = () => {
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const isProgrammaticScrollRef = useRef(false);
 
+  const programmaticTimeoutRef = useRef<number | null>(null);
+
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
 
@@ -180,15 +182,36 @@ export const WhatIBuild: React.FC = () => {
     const targetProgress = targets[idx] ?? 0.06;
     const targetScroll = st.start + (st.end - st.start) * targetProgress;
 
+    // Prevent onUpdate from executing during programmatic jump
     isProgrammaticScrollRef.current = true;
-    window.scrollTo(0, targetScroll);
+    if (programmaticTimeoutRef.current) {
+      window.clearTimeout(programmaticTimeoutRef.current);
+    }
+
+    // Temporarily bypass smooth scrolling on the root element so the browser jumps in 0ms
+    // without traversing or flickering intermediate panels
+    const html = document.documentElement;
+    const prevScrollBehavior = html.style.scrollBehavior;
+    html.classList.remove('scroll-smooth');
+    html.style.scrollBehavior = 'auto';
+
+    window.scrollTo({ top: targetScroll, behavior: 'instant' });
     ScrollTrigger.update();
 
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        isProgrammaticScrollRef.current = false;
-      }, 60);
+      html.classList.add('scroll-smooth');
+      if (prevScrollBehavior) {
+        html.style.scrollBehavior = prevScrollBehavior;
+      } else {
+        html.style.removeProperty('scroll-behavior');
+      }
     });
+
+    // Hold the flag until CSS flex transitions settle
+    programmaticTimeoutRef.current = window.setTimeout(() => {
+      isProgrammaticScrollRef.current = false;
+      programmaticTimeoutRef.current = null;
+    }, 400);
   };
 
   return (
