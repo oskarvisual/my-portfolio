@@ -29,8 +29,11 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
 
   // Playback lifecycle: 'idle' (waiting to play) | 'playing' | 'ended' (finished)
   const [playbackState, setPlaybackState] = useState<'idle' | 'playing' | 'ended'>('idle');
+  const [fadeToBlackOpacity, setFadeToBlackOpacity] = useState(0);
   const [copied, setCopied] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const FADE_OUT_DURATION = 1.5; // seconds for smooth audio/video fade-out
 
   // Synchronize clock every second with actual system time
   useEffect(() => {
@@ -40,6 +43,48 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Smooth audio volume and video fade to black over the last 1.5 seconds
+  useEffect(() => {
+    if (playbackState !== 'playing') {
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    let animId: number;
+
+    const checkFade = () => {
+      if (!video.paused && !video.ended && video.duration && !isNaN(video.duration)) {
+        const remaining = video.duration - video.currentTime;
+        if (remaining <= FADE_OUT_DURATION) {
+          // Progress from 0 (at 1.5s remaining) to 1 (at end)
+          const progress = Math.max(0, Math.min(1, 1 - remaining / FADE_OUT_DURATION));
+
+          // Audio fade-out: smoothly decrease volume to 0
+          try {
+            video.volume = Math.max(0, Math.min(1, 1 - progress));
+          } catch {}
+
+          // Video fade to black: smoothly increase black overlay opacity to 1
+          setFadeToBlackOpacity(progress);
+        } else {
+          try {
+            if (video.volume !== 1) video.volume = 1;
+          } catch {}
+          setFadeToBlackOpacity(0);
+        }
+      }
+      animId = requestAnimationFrame(checkFade);
+    };
+
+    animId = requestAnimationFrame(checkFade);
+
+    return () => {
+      cancelAnimationFrame(animId);
+    };
+  }, [playbackState]);
 
   // Force video first frame rendering on mount
   useEffect(() => {
@@ -66,7 +111,13 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = false; // Start with full sound
+    try {
+      video.currentTime = 0;
+      video.volume = 1;
+      video.muted = false; // Start with full sound
+    } catch {}
+    setFadeToBlackOpacity(0);
+
     const playPromise = video.play();
 
     if (playPromise !== undefined) {
@@ -83,6 +134,13 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
   };
 
   const handleVideoEnded = () => {
+    const video = videoRef.current;
+    if (video) {
+      try {
+        video.volume = 0;
+      } catch {}
+    }
+    setFadeToBlackOpacity(1);
     setPlaybackState('ended');
   };
 
@@ -93,8 +151,10 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
 
     try {
       video.currentTime = 0;
+      video.volume = 1;
       video.muted = false;
     } catch {}
+    setFadeToBlackOpacity(0);
 
     const playPromise = video.play();
     if (playPromise !== undefined) {
@@ -147,6 +207,17 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
             playbackState === 'ended' ? 'opacity-0' : 'opacity-100'
           }`}
           aria-label="Oscar Fernandez Presentation Video"
+        />
+
+        {/* ================================================================= */}
+        {/* SMOOTH FADE-TO-BLACK OVERLAY (Last 1.5 seconds)                   */}
+        {/* ================================================================= */}
+        <div
+          className="absolute inset-0 bg-black pointer-events-none z-[15] will-change-opacity"
+          style={{
+            opacity: fadeToBlackOpacity,
+            transition: 'opacity 0.05s linear',
+          }}
         />
 
         {/* ================================================================= */}
