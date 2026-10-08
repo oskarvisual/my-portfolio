@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-interface PluginHighlight {
+interface FeatureHighlightCategory {
   category: string;
   items: { name: string; description: string }[];
 }
@@ -15,14 +15,13 @@ interface Project {
   architecturePoints: string[];
   url?: string;
   urlLabel?: string;
-  featured?: boolean;
-  pluginHighlights?: PluginHighlight[];
+  featureHighlights?: FeatureHighlightCategory[];
+  featureToggleLabel?: string;
 }
 
 const PROJECTS: Project[] = [
   {
     number: '01',
-    featured: true,
     title: 'AT3 Tactical – Custom Enterprise Ecommerce Engine & 14 Bespoke Plugins',
     clientType: 'AT3 Tactical · High-Volume Technical Commerce',
     highlightMetric: '$45M+ Lifetime GMV · Bespoke Theme · 14 Custom Plugins',
@@ -49,7 +48,8 @@ const PROJECTS: Project[] = [
     ],
     url: 'https://www.at3tactical.com',
     urlLabel: 'Visit Storefront',
-    pluginHighlights: [
+    featureToggleLabel: 'Explore All 14 Proprietary Micro-Plugins & Bespoke Theme',
+    featureHighlights: [
       {
         category: 'Catalog, Search & Digital Experience',
         items: [
@@ -149,6 +149,96 @@ const PROJECTS: Project[] = [
   },
   {
     number: '02',
+    title: 'Great Old Broads for Wilderness – Enterprise Platform & Custom UX/UI Design System',
+    clientType: 'National Conservation Non-Profit (US)',
+    highlightMetric: 'Custom UX/UI Design System · 20+ Native Gutenberg Blocks · Monorepo',
+    description:
+      'Engineered an enterprise-grade digital platform and a 100% bespoke UX/UI design system for Great Old Broads for Wilderness, a prominent US women-led grassroots conservation non-profit. Replaced bulky third-party page builders with 20+ native custom Gutenberg blocks (React + PHP SSR), delivering 1:1 visual parity between the WordPress editor and frontend, frictionless donation funnels, and sub-second Core Web Vitals.',
+    architecturePoints: [
+      'Bespoke UX/UI Design System: Proprietary design tokens (broads-purple, coral, sunshine), Geist & Inter typography, and conversion-optimized donation & grassroots advocacy funnels.',
+      '20+ Native Custom Gutenberg Blocks: Hybrid architecture coupling React/JSX block editors with PHP SSR classes (GreatOldBroads_Abstract_Block) for semantic, zero-bloat HTML output.',
+      '1:1 Visual Parity (Editor vs. Frontend): What content teams construct in the React editor matches the live public experience pixel-for-pixel, eliminating layout surprises.',
+      'Modular Monorepo Architecture: Strict separation of concerns segregating theme presentation, decoupled portable custom-plugins, mu-plugins, and Docker Compose local orchestration.',
+    ],
+    stack: [
+      'WordPress',
+      'PHP 8.3 OOP',
+      'React',
+      'Gutenberg API',
+      'Tailwind CSS 3.4',
+      'esbuild',
+      'Lucide Icons',
+      'Docker Compose',
+      'MariaDB 11.4',
+    ],
+    url: 'https://www.greatoldbroads.org',
+    urlLabel: 'Visit Live Platform',
+    featureToggleLabel: 'Explore Bespoke Design System & 20+ Native Gutenberg Blocks',
+    featureHighlights: [
+      {
+        category: 'Custom-Authored UX/UI & Design System',
+        items: [
+          {
+            name: 'Bespoke Brand Tokens & Palette',
+            description:
+              'Tailored color architecture (broads-purple, coral, paper, sunshine), soft elevation system (shadow-soft), and modern typography pairing (Geist & Inter).',
+          },
+          {
+            name: 'Advocacy & High-Conversion Donor Journeys',
+            description:
+              'Frictionless donation funnels, multi-tiered membership subscriptions, grassroots action petitions, and downloadable conservation toolkits.',
+          },
+          {
+            name: 'Zero Design-to-Code Fidelity Loss',
+            description:
+              'Direct UX/UI leadership into engineering—every microinteraction, responsive rhythm, hover state, and accessible element crafted without translation gaps.',
+          },
+        ],
+      },
+      {
+        category: '20+ Native Gutenberg Blocks (Zero Bloatware)',
+        items: [
+          {
+            name: '1:1 Visual Parity (Admin vs Frontend)',
+            description:
+              'The editor React canvas renders exactly as the public site does, empowering non-technical editorial teams to publish complex layouts with zero styling breakage.',
+          },
+          {
+            name: 'Hybrid Rendering (React + SSR PHP)',
+            description:
+              'Interactive React block interface for editors paired with lightweight, semantic server-side PHP classes (GreatOldBroads_Abstract_Block) for optimal SEO & CWV.',
+          },
+          {
+            name: 'Custom Block Suite',
+            description:
+              'Includes banner-hero, advocacy-actions, four-pillars, giving-options, people-grid, impact-stats, and custom testimonial carousels.',
+          },
+        ],
+      },
+      {
+        category: 'Modern Engineering Monorepo & Pipeline',
+        items: [
+          {
+            name: 'Decoupled Monorepo Structure',
+            description:
+              'Strict separation of concerns isolating theme presentation (theme/greatoldbroads/), business logic (custom-plugins/), and mu-plugins/.',
+          },
+          {
+            name: 'Tailwind CSS 3.4 & esbuild Compilation',
+            description:
+              'Compiles only used utility classes with zero dead CSS; esbuild bundles all React Gutenberg blocks in milliseconds, auto-mapping wp.* globals.',
+          },
+          {
+            name: 'Living Architecture Skills & ADRs',
+            description:
+              'Engineering standards and component lifecycles codified as living specs for seamless long-term maintainability and AI-assisted pair programming.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    number: '03',
     title: 'bAInners – AI Image Banners',
     clientType: 'Shopify App Store · Visual AI Commerce',
     highlightMetric: '10x Faster Campaign Turnaround · Multi-Ratio AI Assets',
@@ -164,7 +254,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View Live App',
   },
   {
-    number: '03',
+    number: '04',
     title: 'AI Product Questions & Answers',
     clientType: 'Shopify App Store · Conversational Commerce',
     highlightMetric: 'Automated Customer Inquiry Resolution · Conversion Uplift',
@@ -180,7 +270,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View Live App',
   },
   {
-    number: '04',
+    number: '05',
     title: 'BrAIker – Trading Bot Fleet Control Room',
     clientType: 'FinTech & Algorithmic Trading Platform',
     highlightMetric: 'Deterministic Risk Gates · Multi-Agent Alpaca Fleet',
@@ -196,7 +286,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View on GitHub',
   },
   {
-    number: '05',
+    number: '06',
     title: 'Wave Putaway Mobile App',
     clientType: 'AT3 Tactical · Industrial Warehouse Mobile Software',
     highlightMetric: '0% Placement Errors · 40%+ Dock-to-Stock Acceleration',
@@ -213,7 +303,11 @@ const PROJECTS: Project[] = [
 ];
 
 export const Projects: React.FC = () => {
-  const [pluginsExpanded, setPluginsExpanded] = useState(false);
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+
+  const toggleCard = (num: string) => {
+    setExpandedCard((prev) => (prev === num ? null : num));
+  };
 
   return (
     <section
@@ -242,28 +336,19 @@ export const Projects: React.FC = () => {
         {/* Project Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
           {PROJECTS.map((proj) => {
-            const isFeatured = proj.featured;
+            const isExpanded = expandedCard === proj.number;
 
             return (
               <div
                 key={proj.number}
-                className={`group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl ${
-                  isFeatured ? 'md:col-span-2 bg-warm-50/90 border-ink/20 shadow-sm' : ''
-                }`}
+                className="group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl"
               >
                 <div className="space-y-6">
                   {/* Header row */}
                   <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-2xl font-light text-accent">
-                        {proj.number}
-                      </span>
-                      {isFeatured && (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-accent/15 text-accent font-semibold border border-accent/25">
-                          Flagship Ecosystem
-                        </span>
-                      )}
-                    </div>
+                    <span className="font-mono text-2xl font-light text-accent">
+                      {proj.number}
+                    </span>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
                         {proj.clientType}
@@ -324,11 +409,7 @@ export const Projects: React.FC = () => {
                     <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
                       Architecture &amp; Business Value:
                     </span>
-                    <ul
-                      className={`space-y-1.5 text-xs font-sans text-ink/90 ${
-                        isFeatured ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 space-y-0' : ''
-                      }`}
-                    >
+                    <ul className="space-y-1.5 text-xs font-sans text-ink/90">
                       {proj.architecturePoints.map((point) => (
                         <li key={point} className="flex items-start gap-2">
                           <span className="text-accent mt-0.5 shrink-0">✦</span>
@@ -338,30 +419,30 @@ export const Projects: React.FC = () => {
                     </ul>
                   </div>
 
-                  {/* Expandable Custom Plugins Section (for Featured Project) */}
-                  {proj.pluginHighlights && (
+                  {/* Expandable Feature / Plugin Highlights */}
+                  {proj.featureHighlights && (
                     <div className="pt-3 border-t border-ink/10">
                       <button
                         type="button"
-                        onClick={() => setPluginsExpanded(!pluginsExpanded)}
+                        onClick={() => toggleCard(proj.number)}
                         className="w-full flex items-center justify-between p-3.5 rounded-xl bg-ink/[0.03] hover:bg-accent/10 border border-ink/10 hover:border-accent/30 transition-all text-left group/toggle cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-accent font-mono text-xs">⚡</span>
                           <span className="font-mono text-xs font-semibold text-ink group-hover/toggle:text-accent">
-                            {pluginsExpanded
-                              ? 'Hide Proprietary Plugins & Integrations'
-                              : 'Explore All 14 Proprietary Micro-Plugins & Bespoke Theme'}
+                            {isExpanded
+                              ? 'Hide Detailed Technical Breakdown'
+                              : proj.featureToggleLabel || 'Explore Full Architectural Breakdown'}
                           </span>
                         </div>
                         <span className="font-mono text-xs text-accent transition-transform duration-200">
-                          {pluginsExpanded ? '▲ Collapse' : '▼ View Breakdown (14)'}
+                          {isExpanded ? '▲ Collapse' : '▼ View (Details)'}
                         </span>
                       </button>
 
-                      {pluginsExpanded && (
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
-                          {proj.pluginHighlights.map((cat) => (
+                      {isExpanded && (
+                        <div className="mt-4 space-y-4 animate-fadeIn">
+                          {proj.featureHighlights.map((cat) => (
                             <div
                               key={cat.category}
                               className="p-4 rounded-2xl bg-paper/90 border border-ink/10 space-y-3"
