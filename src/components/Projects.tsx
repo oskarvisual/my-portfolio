@@ -138,17 +138,25 @@ const PROJECTS: Project[] = [
   },
   {
     number: '06',
-    title: 'Wave Putaway Mobile App',
+    title: 'Wave Putaway App & Python Logistics API',
     clientType: 'AT3 Tactical · Industrial Warehouse Mobile Software',
     highlightMetric: '0% Placement Errors · 50% Dock-to-Stock Acceleration',
     description:
-      'Ruggedized mobile warehouse station engineered on Retool Mobile and Zebra terminals. Guides warehouse operators through fail-safe 3-step putaway workflows with real-time transactional ERP inventory synchronization.',
+      'Industrial mobile workstation and Python backend connecting warehouse floor operators (Retool Mobile + Zebra) with Finale Inventory. Guides operators through fail-safe scan putaway, cart lock concurrency, split-bin allocations, and real-time ERP inventory reconciliation.',
     architecturePoints: [
-      'Native Zebra DataWedge laser scanning with instant burst barcode verification (RCV Cart ➔ SKU ➔ Bin ID)',
-      '3-phase idempotent sync (prepare ➔ confirm ➔ transferred) guaranteeing zero duplicated ERP transfers',
-      'Session takeover protocol between shifts and live telemetry health dashboard (API, DB, Redis, Finale)',
+      'Real-Time Cart & Session Concurrency: Prevents collision on the same receiving cart, supports seamless shift takeovers, and tracks item-level operator progress.',
+      'Scan-Guided Verification & Split Putaway: Laser barcode validation (RCV Cart ➔ SKU ➔ Bin) with dynamic split putaway across multiple destination bins without count drift.',
+      'Idempotent Finale Inventory Sync: Background Redis queues with dry-run transfer simulations and incremental 3-phase synchronization ensuring zero duplicate records.',
     ],
-    stack: ['Retool Mobile', 'Zebra DataWedge', 'Finale Inventory API', 'PostgreSQL', 'Redis', 'Node.js / REST Webhooks'],
+    stack: [
+      'Python (FastAPI)',
+      'Retool Mobile',
+      'Zebra DataWedge',
+      'Finale Inventory API',
+      'PostgreSQL',
+      'Redis',
+      'Docker',
+    ],
     urlLabel: 'Enterprise Operations',
   },
 ];
