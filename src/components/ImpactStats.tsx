@@ -75,11 +75,11 @@ const DISCIPLINES: DisciplineItem[] = [
     skills: ['Git / GitHub', 'Continuous Integration', 'Versioned Releases', 'Release Validation'],
   },
   {
-    tag: 'RELIABLE BACKEND',
-    title: 'Fault-Tolerant Pipelines',
+    tag: 'TECHNICAL SEO',
+    title: 'SEO & Structured Data',
     description:
-      'Resilient backend services engineered with webhooks, cron jobs, background queue workers, exponential retries, rate limits, and reliable data synchronization.',
-    skills: ['Webhooks & Cron Jobs', 'Background Retries', 'Rate Limiting', 'Data Synchronization'],
+      'Technical SEO built into site architecture — schema markup, crawlability, indexing, canonical URLs, redirects, XML sitemaps, and Core Web Vitals.',
+    skills: ['Schema Markup', 'Crawlability & Indexing', 'Canonicals & Redirects', 'Sitemaps & Core Web Vitals'],
   },
   {
     tag: 'TECHNICAL CMS',
