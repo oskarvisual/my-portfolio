@@ -1,83 +1,62 @@
 import React, { useState, useRef } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
-import sampleVideo from '../assets/videos/ecommerce.mp4';
+import myPresentationVideo from '../assets/videos/my-presentation.mp4';
+import cvPdf from '../assets/docs/cv.pdf';
 
 interface HeroPhoneProps {
-  /** Optional video source; defaults to placeholder video until user provides final asset */
+  /** Optional video source; defaults to my-presentation.mp4 */
   videoSrc?: string;
-  /** Optional custom poster or title */
-  title?: string;
   className?: string;
 }
 
 export const HeroPhone: React.FC<HeroPhoneProps> = ({
-  videoSrc = sampleVideo,
-  title = 'Oscar Fernandez · Full-Stack Ecommerce',
+  videoSrc = myPresentationVideo,
   className = '',
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
+  // Playback lifecycle: 'idle' (before play) | 'playing' | 'ended' (finished)
+  const [playbackState, setPlaybackState] = useState<'idle' | 'playing' | 'ended'>('idle');
+  const [copied, setCopied] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const togglePlay = () => {
+  // Play video with audio from start, locking out all controls
+  const handleStartPlay = () => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
-      video.pause();
-      setIsPlaying(false);
-    } else {
-      const promise = video.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            // If browser blocks unmuted audio on initial play, fallback to muted
-            video.muted = true;
-            setIsMuted(true);
-            video.play();
-            setIsPlaying(true);
-          });
-      }
+    video.currentTime = 0;
+    video.muted = false; // Play with full audio
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setPlaybackState('playing');
+        })
+        .catch((err) => {
+          console.warn('Playback gesture error, retrying:', err);
+          // Fallback if browser requires muted on strict policies
+          video.muted = true;
+          video.play().then(() => setPlaybackState('playing')).catch(() => {});
+        });
     }
   };
 
-  const toggleMute = (e: React.MouseEvent) => {
+  const handleVideoEnded = () => {
+    setPlaybackState('ended');
+  };
+
+  // Play again handler
+  const handlePlayAgain = () => {
+    handleStartPlay();
+  };
+
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
+    navigator.clipboard.writeText('oskarvisual@gmail.com');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
-
-  const handleTimeUpdate = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    setCurrentTime(video.currentTime);
-  };
-
-  const handleLoadedMetadata = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    setDuration(video.duration || 0);
-  };
-
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video || !duration) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const newPercentage = Math.max(0, Math.min(1, clickX / rect.width));
-    video.currentTime = newPercentage * duration;
-    setCurrentTime(video.currentTime);
-  };
-
-  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
     <div
@@ -86,25 +65,20 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         // Maintain exact iPhone 17 physical aspect ratio: 72.5mm / 150mm
         aspectRatio: '72.5 / 150',
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* =================================================================== */}
       {/* 1. IPHONE SCREEN LAYER (Underneath SVG bezel frame)                 */}
       {/* =================================================================== */}
       <div
-        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] bg-[#08080a] overflow-hidden flex flex-col justify-between shadow-inner"
+        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] bg-black overflow-hidden flex flex-col justify-between"
         style={{
-          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)',
+          boxShadow: 'inset 0 0 25px rgba(0,0,0,0.95)',
         }}
       >
-        {/* iOS Top Status Bar (positioned just below top bezel) */}
-        <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/70 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none">
-          {/* Time (left of Dynamic Island) */}
-          <span className="font-semibold text-white/90">9:41</span>
-
-          {/* Status Icons (right of Dynamic Island) */}
-          <div className="flex items-center gap-1.5 text-white/80">
+        {/* iOS Top Status Bar (9:41, Cellular, 5G, Battery) */}
+        <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/80 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none">
+          <span className="font-semibold text-white">9:41</span>
+          <div className="flex items-center gap-1.5 text-white/90">
             {/* Cellular signal */}
             <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 16 16">
               <rect x="1" y="11" width="2" height="4" rx="0.5" />
@@ -112,136 +86,202 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
               <rect x="9" y="5" width="2" height="10" rx="0.5" />
               <rect x="13" y="2" width="2" height="13" rx="0.5" />
             </svg>
-            {/* 5G */}
             <span className="text-[8px] font-bold">5G</span>
             {/* Battery */}
-            <div className="w-4 h-2 rounded-[2px] border border-white/70 p-[1px] flex items-center">
-              <div className="h-full w-3/4 bg-white/90 rounded-[1px]" />
+            <div className="w-4 h-2 rounded-[2px] border border-white/80 p-[1px] flex items-center">
+              <div className="h-full w-3/4 bg-white rounded-[1px]" />
             </div>
           </div>
         </div>
 
         {/* ================================================================= */}
-        {/* 2. CENTERED 16:9 VIDEO CONTAINER                                 */}
+        {/* 2. MIDDLE SCREEN AREA: VIDEO OR END-CONTACT CARD                  */}
         {/* ================================================================= */}
-        <div
-          onClick={togglePlay}
-          className="relative w-full aspect-video my-auto bg-black/90 flex items-center justify-center cursor-pointer group overflow-hidden border-y border-white/5 shadow-2xl"
-        >
-          {/* Native HTML5 Video Element (16:9) */}
-          <video
-            ref={videoRef}
-            src={videoSrc}
-            playsInline
-            loop
-            muted={isMuted}
-            preload="metadata"
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onEnded={() => setIsPlaying(false)}
-            className="w-full h-full object-cover block bg-black"
-            aria-label={title}
-          />
+        <div className="relative w-full flex-1 flex flex-col items-center justify-center overflow-hidden">
+          {/* ------------------------------------------------------------- */}
+          {/* STATE A: VIDEO PLAYER (When idle or playing)                   */}
+          {/* ------------------------------------------------------------- */}
+          {playbackState !== 'ended' && (
+            <div className="relative w-full aspect-video my-auto bg-black flex items-center justify-center overflow-hidden">
+              <video
+                ref={videoRef}
+                src={videoSrc}
+                playsInline
+                preload="auto"
+                onEnded={handleVideoEnded}
+                // When playing, no controls allowed and no scrubbing
+                className="w-full h-full object-cover block bg-black pointer-events-none"
+                aria-label="Oscar Fernandez Presentation Video"
+              />
 
-          {/* Subtle Ambient Video Gradient Overlay for High-End Cinematic Look */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none transition-opacity duration-300 ${
-              isPlaying && !isHovered ? 'opacity-0' : 'opacity-100'
-            }`}
-          />
+              {/* INITIAL PLAY BUTTON (YouTube / iOS Style) */}
+              {playbackState === 'idle' && (
+                <div
+                  onClick={handleStartPlay}
+                  className="absolute inset-0 flex items-center justify-center cursor-pointer bg-black/40 hover:bg-black/25 transition-all group"
+                  aria-label="Play presentation video with sound"
+                >
+                  {/* YouTube / iOS Red-Frosted Style Play Badge */}
+                  <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 active:scale-95 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                    {/* Glowing outer pulse */}
+                    <span className="absolute -inset-2 rounded-2xl bg-red-600/40 animate-ping opacity-75 pointer-events-none" />
 
-          {/* =============================================================== */}
-          {/* LARGE PLAY BUTTON ICON (In middle of 16:9 video)                */}
-          {/* =============================================================== */}
-          <div
-            className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 ${
-              isPlaying && !isHovered
-                ? 'opacity-0 scale-90'
-                : 'opacity-100 scale-100'
-            }`}
-          >
-            <div className="relative flex items-center justify-center">
-              {/* Pulsing ring animation when video is paused */}
-              {!isPlaying && (
-                <span className="absolute -inset-2.5 rounded-full bg-accent/40 animate-ping opacity-60 pointer-events-none" />
+                    {/* YouTube/iOS Icon Frame */}
+                    <div className="relative w-16 h-11 sm:w-18 sm:h-12 rounded-2xl bg-[#ff0000] hover:bg-[#cc0000] flex items-center justify-center shadow-lg border border-white/20 transition-colors">
+                      {/* Triangle Play Icon (Pure White) */}
+                      <svg
+                        className="w-6 h-6 fill-white translate-x-0.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Tap to watch indicator */}
+                  <div className="absolute bottom-2 inset-x-0 text-center pointer-events-none">
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-white/90 drop-shadow">
+                      Play presentation
+                    </span>
+                  </div>
+                </div>
               )}
+            </div>
+          )}
 
-              {/* The Big Play Button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  togglePlay();
-                }}
-                className="relative pointer-events-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-accent hover:bg-accent/90 active:scale-95 text-paper flex items-center justify-center shadow-[0_10px_30px_rgba(189,83,43,0.5)] border border-white/20 transition-all duration-300 hover:scale-105 group-hover:shadow-[0_15px_35px_rgba(189,83,43,0.7)]"
-                aria-label={isPlaying ? 'Pause video' : 'Play video'}
-              >
-                {isPlaying ? (
-                  // Pause Icon
-                  <svg
-                    className="w-6 h-6 fill-current text-white"
-                    viewBox="0 0 24 24"
+          {/* ------------------------------------------------------------- */}
+          {/* STATE B: END SCREEN (Black background + Contact info + Play Again) */}
+          {/* ------------------------------------------------------------- */}
+          {playbackState === 'ended' && (
+            <div className="absolute inset-0 z-20 bg-black flex flex-col justify-between px-4 py-3 text-white animate-fadeIn overflow-hidden">
+              {/* TOP: Contact Info & Channels (matching Footer) */}
+              <div className="w-full flex-1 flex flex-col justify-center space-y-2.5 pt-2">
+                {/* Header / Intro */}
+                <div className="text-center space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/15 text-[8px] font-mono uppercase tracking-wider text-white/80">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Available for Work
+                  </div>
+
+                  <h3 className="font-sans font-bold text-base text-white tracking-tight leading-tight">
+                    Oscar Fernandez
+                  </h3>
+                  <p className="font-mono text-[9px] text-white/70 uppercase tracking-wider">
+                    Full-Stack Ecommerce Engineer
+                  </p>
+                </div>
+
+                {/* Direct Action Channels */}
+                <div className="space-y-1.5 pt-1">
+                  {/* 1. Schedule a Call (Calendly) */}
+                  <a
+                    href="https://calendly.com/oscarferher"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full px-3 py-2 rounded-xl bg-white text-black hover:bg-white/90 font-sans text-[10px] font-bold tracking-wide flex items-center justify-between transition-colors shadow-sm"
                   >
-                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                  </svg>
-                ) : (
-                  // Large Play Icon (triangle)
-                  <svg
-                    className="w-7 h-7 fill-current text-white translate-x-0.5"
-                    viewBox="0 0 24 24"
-                  >
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      Schedule Discovery Call
+                    </span>
+                    <span className="text-[9px]">↗</span>
+                  </a>
+
+                  {/* 2. Direct Email */}
+                  <div className="w-full px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between text-[9px] font-mono text-white">
+                    <a
+                      href="mailto:oskarvisual@gmail.com"
+                      className="truncate hover:text-white/80 flex items-center gap-1.5"
+                    >
+                      <span>✉</span>
+                      <span className="truncate">oskarvisual@gmail.com</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleCopyEmail}
+                      className="px-1.5 py-0.5 rounded bg-white/20 hover:bg-white/30 text-[8px] uppercase tracking-wider text-white shrink-0 ml-1 transition-colors"
+                    >
+                      {copied ? '✓ Copied' : 'Copy'}
+                    </button>
+                  </div>
+
+                  {/* 3. WhatsApp & Phone */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <a
+                      href="https://wa.me/51977675421?text=Hi%20Oscar%2C%20I%20saw%20your%20presentation%20video%20and%20would%20like%20to%20connect."
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    >
+                      <span className="text-emerald-400">●</span>
+                      <span>WhatsApp</span>
+                      <span className="text-[8px]">↗</span>
+                    </a>
+
+                    <a
+                      href="tel:+51977675421"
+                      className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    >
+                      <span>📞</span>
+                      <span>Call</span>
+                      <span className="text-[8px]">↗</span>
+                    </a>
+                  </div>
+
+                  {/* 4. LinkedIn & Resume */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <a
+                      href="https://www.linkedin.com/in/oscarfer/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    >
+                      <span>LinkedIn</span>
+                      <span className="text-[8px]">↗</span>
+                    </a>
+
+                    <a
+                      href={cvPdf}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download="Oscar_Fernandez_CV.pdf"
+                      className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    >
+                      <span>Resume ↓</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM: "Play again" button with Play Icon (White letters, white icon, centered) */}
+              <div className="w-full pt-2 pb-1 flex flex-col items-center justify-center">
+                <button
+                  type="button"
+                  onClick={handlePlayAgain}
+                  className="group px-4 py-1.5 rounded-full border border-white/40 hover:border-white hover:bg-white/15 text-white flex items-center gap-2 transition-all duration-300 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+                  aria-label="Play video again"
+                >
+                  {/* White Play Icon */}
+                  <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                )}
-              </button>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-white font-medium group-hover:tracking-wider transition-all">
+                    Play again
+                  </span>
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Video Micro Controls: Time Bar & Mute Button */}
-          <div
-            className={`absolute bottom-0 inset-x-0 p-2 flex items-center justify-between gap-2 z-10 transition-opacity duration-300 ${
-              isPlaying && !isHovered ? 'opacity-0' : 'opacity-100'
-            }`}
-          >
-            {/* Interactive Progress Bar */}
-            <div
-              onClick={handleSeek}
-              className="flex-1 h-1 bg-white/20 hover:h-1.5 rounded-full overflow-hidden cursor-pointer transition-all"
-            >
-              <div
-                className="h-full bg-accent transition-all duration-100"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-
-            {/* Audio Mute/Unmute Toggle */}
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="p-1 rounded-full bg-black/60 hover:bg-black/80 text-white/80 hover:text-white transition-colors"
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted ? (
-                // Muted speaker
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                  <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-                </svg>
-              ) : (
-                // Loudspeaker
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                </svg>
-              )}
-            </button>
-          </div>
+          )}
         </div>
 
         {/* iOS Bottom Home Indicator Bar */}
-        <div className="relative z-10 w-full pb-2.5 flex flex-col items-center justify-center gap-1 select-none pointer-events-none">
-          <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">
-            Tap to watch
-          </span>
-          <div className="w-24 h-1 bg-white/30 rounded-full" />
+        <div className="relative z-10 w-full pb-2.5 flex items-center justify-center pointer-events-none">
+          <div className="w-24 h-1 bg-white/40 rounded-full" />
         </div>
       </div>
 
@@ -251,13 +291,13 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
       <img
         src={iphoneFrame}
         alt="iPhone 17 Chassis Frame"
-        className="absolute inset-0 w-full h-full object-contain pointer-events-none z-20 select-none drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
+        className="absolute inset-0 w-full h-full object-contain pointer-events-none z-30 select-none drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
         loading="eager"
       />
 
       {/* Subtle realistic diagonal glass reflection over the front */}
       <div
-        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] pointer-events-none z-30 overflow-hidden opacity-25"
+        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] pointer-events-none z-40 overflow-hidden opacity-25"
         style={{
           background:
             'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.02) 40%, transparent 60%)',
