@@ -87,8 +87,8 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
         </span>
       </div>
 
-      {/* 2. Central Media Area — iPhone 17 Showcase with 16:9 Video & Big Play Button */}
-      <div className="hidden lg:flex absolute top-1/2 right-6 lg:right-[8%] xl:right-[12%] 2xl:right-[15%] -translate-y-1/2 z-20 items-center justify-center pointer-events-auto">
+      {/* 2. Central Media Area — iPhone 17 Showcase with Video & Play Button */}
+      <div className="hidden lg:flex absolute top-1/2 right-6 lg:right-[8%] xl:right-[12%] 2xl:right-[15%] -translate-y-1/2 z-30 items-center justify-center pointer-events-auto">
         <div
           ref={mediaContainerRef}
           className="relative h-[440px] lg:h-[490px] xl:h-[540px] 2xl:h-[580px]"
@@ -98,8 +98,8 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
       </div>
 
       {/* 3. Foreground Left Narrative Content */}
-      <div className="relative z-20 max-w-7xl mx-auto w-full my-auto flex flex-col justify-center">
-        <div ref={contentRef} className="max-w-2xl lg:max-w-3xl space-y-6 md:space-y-8">
+      <div className="relative z-10 max-w-7xl mx-auto w-full my-auto flex flex-col justify-center pointer-events-none">
+        <div ref={contentRef} className="max-w-2xl lg:max-w-3xl space-y-6 md:space-y-8 pointer-events-auto">
           {/* Eyebrow */}
           <div className="flex items-center gap-3">
             <span className="w-6 h-[1px] bg-accent" />

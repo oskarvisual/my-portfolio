@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
 import myPresentationVideo from '../assets/videos/my-presentation.mp4';
 import cvPdf from '../assets/docs/cv.pdf';
@@ -18,15 +18,32 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
   const [copied, setCopied] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Play video with audio from start, locking out all controls
+  // Force video first frame rendering on mount
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleReady = () => {
+      try {
+        if (video.currentTime === 0) {
+          video.currentTime = 0.001;
+        }
+      } catch {}
+    };
+
+    if (video.readyState >= 1) {
+      handleReady();
+    } else {
+      video.addEventListener('loadeddata', handleReady, { once: true });
+    }
+  }, [videoSrc]);
+
+  // Start video playback with unmuted sound
   const handleStartPlay = () => {
     const video = videoRef.current;
     if (!video) return;
 
-    try {
-      video.muted = false; // Play with full unmuted sound
-    } catch {}
-
+    video.muted = false; // Start with full sound
     const playPromise = video.play();
 
     if (playPromise !== undefined) {
@@ -35,12 +52,9 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
           setPlaybackState('playing');
         })
         .catch((err) => {
-          console.warn('Playback error with sound, attempting fallback:', err);
-          // Fallback if browser strict policy requires initial muted playback
-          try {
-            video.muted = true;
-            video.play().then(() => setPlaybackState('playing')).catch(() => {});
-          } catch {}
+          console.warn('Playback with sound policy fallback:', err);
+          video.muted = true;
+          video.play().then(() => setPlaybackState('playing')).catch(console.error);
         });
     }
   };
@@ -49,7 +63,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
     setPlaybackState('ended');
   };
 
-  // Play again handler
+  // Replay from beginning
   const handlePlayAgain = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -66,10 +80,8 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
           setPlaybackState('playing');
         })
         .catch(() => {
-          try {
-            video.muted = true;
-            video.play().then(() => setPlaybackState('playing')).catch(() => {});
-          } catch {}
+          video.muted = true;
+          video.play().then(() => setPlaybackState('playing')).catch(console.error);
         });
     }
   };
@@ -84,33 +96,32 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
 
   return (
     <div
-      className={`relative select-none ${className}`}
+      className={`relative select-none pointer-events-auto ${className}`}
       style={{
         // Maintain exact iPhone 17 physical aspect ratio: 72.5mm / 150mm
         aspectRatio: '72.5 / 150',
       }}
     >
       {/* =================================================================== */}
-      {/* 1. IPHONE SCREEN LAYER (Underneath SVG bezel frame)                 */}
+      {/* 1. IPHONE SCREEN LAYER                                              */}
       {/* =================================================================== */}
       <div
-        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] bg-black overflow-hidden flex flex-col justify-between"
+        className="absolute inset-[1.64%_4.02%] rounded-[14%/7%] bg-black overflow-hidden flex flex-col justify-between z-10"
         style={{
           boxShadow: 'inset 0 0 25px rgba(0,0,0,0.95)',
         }}
       >
         {/* ================================================================= */}
-        {/* FULL-SCREEN VERTICAL VIDEO (Fills entire iPhone screen)           */}
+        {/* FULL VERTICAL SCREEN VIDEO                                        */}
         {/* ================================================================= */}
         <video
           ref={videoRef}
-          src={videoSrc}
+          src={`${videoSrc}#t=0.001`}
           playsInline
           preload="auto"
           onEnded={handleVideoEnded}
-          // The video fills the entire phone display vertically
-          className={`absolute inset-0 w-full h-full object-cover block bg-black z-0 transition-opacity duration-300 ${
-            playbackState === 'ended' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          className={`absolute inset-0 w-full h-full object-cover block bg-black z-0 transition-opacity duration-300 pointer-events-none ${
+            playbackState === 'ended' ? 'opacity-0' : 'opacity-100'
           }`}
           aria-label="Oscar Fernandez Presentation Video"
         />
@@ -118,7 +129,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         {/* ================================================================= */}
         {/* iOS Top Status Bar (9:41, Cellular, 5G, Battery)                  */}
         {/* ================================================================= */}
-        <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/85 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none drop-shadow">
+        <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/90 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none drop-shadow">
           <span className="font-semibold text-white">9:41</span>
           <div className="flex items-center gap-1.5 text-white/90">
             {/* Cellular signal */}
@@ -137,25 +148,33 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         </div>
 
         {/* ================================================================= */}
-        {/* STATE A: INITIAL PLAY BUTTON OVERLAY (When idle)                  */}
+        {/* STATE A: INITIAL PLAY OVERLAY (Dark veil + centered YouTube play) */}
         {/* ================================================================= */}
         {playbackState === 'idle' && (
           <div
             onClick={handleStartPlay}
-            className="absolute inset-0 z-20 flex items-center justify-center cursor-pointer bg-black/15 hover:bg-black/5 transition-all group"
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer bg-black/40 hover:bg-black/30 transition-all group"
             aria-label="Play presentation video with sound"
           >
-            {/* Iconic, clean YouTube / iOS style play button */}
-            <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 active:scale-95">
-              <div className="w-16 h-11 sm:w-18 sm:h-12 rounded-2xl bg-[#ff0000] hover:bg-[#e60000] flex items-center justify-center shadow-[0_12px_30px_rgba(0,0,0,0.6)] border border-white/20 transition-colors">
-                {/* Crisp pure white play triangle */}
-                <svg
-                  className="w-6 h-6 fill-white translate-x-0.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
+            {/* Perfectly centered official YouTube SVG badge */}
+            <div className="flex flex-col items-center justify-center transition-transform duration-300 group-hover:scale-105 active:scale-95">
+              <svg
+                viewBox="0 0 68 48"
+                className="w-16 h-11 sm:w-18 sm:h-12 drop-shadow-2xl"
+              >
+                {/* Authentic YouTube curved rectangular body */}
+                <path
+                  d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z"
+                  fill="#ff0000"
+                />
+                {/* Mathematically centered white triangle */}
+                <path d="M45 24L27 14v20z" fill="#ffffff" />
+              </svg>
+
+              {/* Small white text below */}
+              <span className="font-mono text-[9px] sm:text-[10px] text-white uppercase tracking-widest drop-shadow-md font-semibold mt-2.5">
+                Play presentation
+              </span>
             </div>
           </div>
         )}
@@ -164,7 +183,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         {/* STATE B: END SCREEN (Full Black + Contact Info + Play Again)      */}
         {/* ================================================================= */}
         {playbackState === 'ended' && (
-          <div className="absolute inset-0 z-20 bg-black flex flex-col justify-between px-4 py-3 text-white animate-fadeIn overflow-hidden">
+          <div className="absolute inset-0 z-50 bg-black pointer-events-auto flex flex-col justify-between px-4 py-3 text-white animate-fadeIn overflow-hidden">
             {/* Top Status Space */}
             <div className="h-4" />
 
@@ -172,7 +191,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
             <div className="w-full flex-1 flex flex-col justify-center space-y-2.5">
               {/* Header / Intro */}
               <div className="text-center space-y-1">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[8px] font-mono uppercase tracking-wider text-white/85">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 border border-white/15 text-[8px] font-mono uppercase tracking-wider text-white/90">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Available for Projects
                 </div>
@@ -192,7 +211,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                   href="https://calendly.com/oscarferher"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full px-3 py-2 rounded-xl bg-white text-black hover:bg-white/90 font-sans text-[10px] font-bold tracking-wide flex items-center justify-between transition-colors shadow-sm"
+                  className="w-full px-3 py-2 rounded-xl bg-white text-black hover:bg-white/90 font-sans text-[10px] font-bold tracking-wide flex items-center justify-between transition-colors shadow-sm cursor-pointer"
                 >
                   <span className="flex items-center gap-1.5">
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -210,7 +229,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                 <div className="w-full px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 flex items-center justify-between text-[9px] font-mono text-white">
                   <a
                     href="mailto:oskarvisual@gmail.com"
-                    className="truncate hover:text-white/80 flex items-center gap-1.5"
+                    className="truncate hover:text-white/80 flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>✉</span>
                     <span className="truncate">oskarvisual@gmail.com</span>
@@ -230,7 +249,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                     href="https://wa.me/51977675421?text=Hi%20Oscar%2C%20I%20saw%20your%20presentation%20video%20and%20would%20like%20to%20connect."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
                   >
                     <span className="text-emerald-400">●</span>
                     <span>WhatsApp</span>
@@ -239,7 +258,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
 
                   <a
                     href="tel:+51977675421"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
                   >
                     <span>📞</span>
                     <span>Call</span>
@@ -253,7 +272,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                     href="https://www.linkedin.com/in/oscarfer/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
                   >
                     <span>LinkedIn</span>
                     <span className="text-[8px]">↗</span>
@@ -264,7 +283,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     download="Oscar_Fernandez_CV.pdf"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white"
+                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
                   >
                     <span>Resume ↓</span>
                   </a>
