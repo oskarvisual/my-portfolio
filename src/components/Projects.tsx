@@ -1,4 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+interface PluginHighlight {
+  category: string;
+  items: { name: string; description: string }[];
+}
 
 interface Project {
   number: string;
@@ -10,11 +15,140 @@ interface Project {
   architecturePoints: string[];
   url?: string;
   urlLabel?: string;
+  featured?: boolean;
+  pluginHighlights?: PluginHighlight[];
 }
 
 const PROJECTS: Project[] = [
   {
     number: '01',
+    featured: true,
+    title: 'AT3 Tactical – Custom Enterprise Ecommerce Engine & 14 Bespoke Plugins',
+    clientType: 'AT3 Tactical · High-Volume Technical Commerce',
+    highlightMetric: '$45M+ Lifetime GMV · Bespoke Theme · 14 Custom Plugins',
+    description:
+      'Architected and engineered the end-to-end ecommerce technology stack for AT3 Tactical—combining a high-conversion custom WooCommerce theme with a proprietary ecosystem of 14 bespoke plugins and cloud microservices. Replaced fragile off-the-shelf plugins with purpose-built, battle-tested solutions: sub-50ms Algolia search, AWS S3/CloudFront asset offloading, real-time Finale Inventory RMA reconciliation, automated affiliate syndication feeds, and zero-defect ShipStation fulfillment routing.',
+    architecturePoints: [
+      'Bespoke WooCommerce Theme: Engineered from scratch for complex variation discovery, technical gear specifications, and lightning-fast checkout flow.',
+      'Sub-50ms Algolia Search & Facets: Enterprise catalog indexing with instant autocomplete, attribute-based filtering, and typo-tolerant discovery across 15,000+ SKUs.',
+      'Automated Multi-Channel Feed Syndication: Custom feed engines for AvantLink and Gun.deals with automated XML generation, commission tiers, and health alerts.',
+      'Two-Way ERP & RMA Inventory Automation: Real-time Finale Inventory synchronization converting customer returns and open-box items into sellable inventory.',
+      'Cloud Media Offloading & Operations: Automated batch AWS S3 + CloudFront CDN migration eliminating disk bloat, paired with Help Scout HPOS order integration and Make.com automation hubs.',
+    ],
+    stack: [
+      'WooCommerce',
+      'PHP 8.2',
+      'MySQL',
+      'Algolia',
+      'AWS S3 / CloudFront',
+      'Finale Inventory',
+      'ShipStation',
+      'Make.com',
+      'Help Scout',
+      'Gutenberg',
+    ],
+    url: 'https://www.at3tactical.com',
+    urlLabel: 'Visit Storefront',
+    pluginHighlights: [
+      {
+        category: 'Catalog, Search & Digital Experience',
+        items: [
+          {
+            name: 'Theme AT3 Tactical',
+            description:
+              'Custom WooCommerce theme engineered for technical gear catalogs, variation discovery, dynamic promos, and sub-second page loads.',
+          },
+          {
+            name: 'AT3 Algolia',
+            description:
+              'Supercharges catalog search with instant autocomplete, faceted filters by price/category/attributes, and sub-50ms product discovery.',
+          },
+          {
+            name: 'AT3 Blocks',
+            description:
+              'Proprietary Gutenberg block library empowering marketing teams to launch high-converting landing pages, FAQs, and promos without developers.',
+          },
+          {
+            name: 'AT3 Image Editor',
+            description:
+              'Secure tokenized bridge connecting WordPress media directly with internal image optimization microservices.',
+          },
+        ],
+      },
+      {
+        category: 'Affiliate & Marketplace Syndication',
+        items: [
+          {
+            name: 'AT3 AvantLink',
+            description:
+              'Automates affiliate feed generation and delivery with dynamic pricing, commission tiers, and category-level exclusion rules.',
+          },
+          {
+            name: 'AT3 Gun.deals Feed Manager',
+            description:
+              'High-throughput XML syndication feed with automated product filtering, feed health diagnostics, and real-time quality alerts.',
+          },
+          {
+            name: 'AT3 Convert Image Links',
+            description:
+              'Auto-downloads and re-hosts external email campaign creatives onto WordPress for Klaviyo, FunnelKit, and ActiveCampaign templates.',
+          },
+        ],
+      },
+      {
+        category: 'Operations, Reverse Logistics & ERP',
+        items: [
+          {
+            name: 'AT3 Open Box Returns',
+            description:
+              'Direct Finale Inventory integration converting returns and open-box gear into live sellable stock with sublocation tracking.',
+          },
+          {
+            name: 'AT3 CSV Importer',
+            description:
+              'Bulk catalog ingestion engine processing GTIN/UPC, MAP, MSRP, wholesale pricing rules, and batch validation at scale.',
+          },
+          {
+            name: 'AT3 Make Integration',
+            description:
+              'Operational middleware hub connecting store orders and catalog events to Make.com scenarios with retry logging.',
+          },
+        ],
+      },
+      {
+        category: 'Fulfillment Integrity, Cloud & Support',
+        items: [
+          {
+            name: 'AT3 S3 Offload',
+            description:
+              'Offloads media libraries to Amazon S3 and CloudFront CDN with automated batch migration, retry queues, and local retention controls.',
+          },
+          {
+            name: 'AT3 ShipStation Gun Bucks Fix',
+            description:
+              'Proportional discount allocation algorithm ensuring accurate line-item totals and frictionless fulfillment dispatch.',
+          },
+          {
+            name: 'AT3 Shipping Zones',
+            description:
+              'Extends shipping zone logic to accurately support US territories (Puerto Rico, Guam) with customized delivery rules.',
+          },
+          {
+            name: 'AT3 HelpScout Integration',
+            description:
+              'Embeds live WooCommerce order data directly into the Help Scout agent sidebar with modern HPOS compatibility.',
+          },
+          {
+            name: 'AT3 YITH Reviews Importer',
+            description:
+              'Review hygiene engine with automated anti-spam filtering, verified-buyer validation, and rating synchronization.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    number: '02',
     title: 'bAInners – AI Image Banners',
     clientType: 'Shopify App Store · Visual AI Commerce',
     highlightMetric: '10x Faster Campaign Turnaround · Multi-Ratio AI Assets',
@@ -30,7 +164,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View Live App',
   },
   {
-    number: '02',
+    number: '03',
     title: 'AI Product Questions & Answers',
     clientType: 'Shopify App Store · Conversational Commerce',
     highlightMetric: 'Automated Customer Inquiry Resolution · Conversion Uplift',
@@ -46,7 +180,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View Live App',
   },
   {
-    number: '03',
+    number: '04',
     title: 'BrAIker – Trading Bot Fleet Control Room',
     clientType: 'FinTech & Algorithmic Trading Platform',
     highlightMetric: 'Deterministic Risk Gates · Multi-Agent Alpaca Fleet',
@@ -62,7 +196,7 @@ const PROJECTS: Project[] = [
     urlLabel: 'View on GitHub',
   },
   {
-    number: '04',
+    number: '05',
     title: 'Wave Putaway Mobile App',
     clientType: 'AT3 Tactical · Industrial Warehouse Mobile Software',
     highlightMetric: '0% Placement Errors · 40%+ Dock-to-Stock Acceleration',
@@ -79,6 +213,8 @@ const PROJECTS: Project[] = [
 ];
 
 export const Projects: React.FC = () => {
+  const [pluginsExpanded, setPluginsExpanded] = useState(false);
+
   return (
     <section
       id="projects"
@@ -105,101 +241,168 @@ export const Projects: React.FC = () => {
 
         {/* Project Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-          {PROJECTS.map((proj) => (
-            <div
-              key={proj.number}
-              className="group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl"
-            >
-              <div className="space-y-6">
-                {/* Header row */}
-                <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
-                  <span className="font-mono text-2xl font-light text-accent">
-                    {proj.number}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
-                      {proj.clientType}
-                    </span>
+          {PROJECTS.map((proj) => {
+            const isFeatured = proj.featured;
+
+            return (
+              <div
+                key={proj.number}
+                className={`group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl ${
+                  isFeatured ? 'md:col-span-2 bg-warm-50/90 border-ink/20 shadow-sm' : ''
+                }`}
+              >
+                <div className="space-y-6">
+                  {/* Header row */}
+                  <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-2xl font-light text-accent">
+                        {proj.number}
+                      </span>
+                      {isFeatured && (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-accent/15 text-accent font-semibold border border-accent/25">
+                          Flagship Ecosystem
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+                        {proj.clientType}
+                      </span>
+                      {proj.url ? (
+                        <a
+                          href={proj.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${proj.urlLabel || 'View Project'}: ${proj.title}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 hover:bg-accent hover:text-paper text-ink transition-all border border-ink/10 hover:border-accent ml-1 group/btn"
+                        >
+                          <span>{proj.urlLabel || 'View'}</span>
+                          <span className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5">
+                            ↗
+                          </span>
+                        </a>
+                      ) : (
+                        proj.urlLabel && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 text-ink-muted border border-ink/10 ml-1">
+                            {proj.urlLabel}
+                          </span>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Metric pill */}
+                  <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
+                    {proj.highlightMetric}
+                  </div>
+
+                  {/* Title & Description */}
+                  <div>
                     {proj.url ? (
                       <a
                         href={proj.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`${proj.urlLabel || 'View Project'}: ${proj.title}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 hover:bg-accent hover:text-paper text-ink transition-all border border-ink/10 hover:border-accent ml-1 group/btn"
+                        className="group/title inline-block"
                       >
-                        <span>{proj.urlLabel || 'View'}</span>
-                        <span className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5">
-                          ↗
-                        </span>
+                        <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover/title:text-accent transition-colors">
+                          {proj.title}
+                        </h3>
                       </a>
                     ) : (
-                      proj.urlLabel && (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 text-ink-muted border border-ink/10 ml-1">
-                          {proj.urlLabel}
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                {/* Metric pill */}
-                <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
-                  {proj.highlightMetric}
-                </div>
-
-                {/* Title & Description */}
-                <div>
-                  {proj.url ? (
-                    <a
-                      href={proj.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/title inline-block"
-                    >
-                      <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover/title:text-accent transition-colors">
+                      <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
                         {proj.title}
                       </h3>
-                    </a>
-                  ) : (
-                    <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
-                      {proj.title}
-                    </h3>
+                    )}
+                    <p className="font-sans text-ink-muted text-sm sm:text-base leading-relaxed mt-3">
+                      {proj.description}
+                    </p>
+                  </div>
+
+                  {/* Key Architecture Highlights */}
+                  <div className="space-y-2 pt-2 border-t border-ink/10">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
+                      Architecture &amp; Business Value:
+                    </span>
+                    <ul
+                      className={`space-y-1.5 text-xs font-sans text-ink/90 ${
+                        isFeatured ? 'grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 space-y-0' : ''
+                      }`}
+                    >
+                      {proj.architecturePoints.map((point) => (
+                        <li key={point} className="flex items-start gap-2">
+                          <span className="text-accent mt-0.5 shrink-0">✦</span>
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Expandable Custom Plugins Section (for Featured Project) */}
+                  {proj.pluginHighlights && (
+                    <div className="pt-3 border-t border-ink/10">
+                      <button
+                        type="button"
+                        onClick={() => setPluginsExpanded(!pluginsExpanded)}
+                        className="w-full flex items-center justify-between p-3.5 rounded-xl bg-ink/[0.03] hover:bg-accent/10 border border-ink/10 hover:border-accent/30 transition-all text-left group/toggle cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-accent font-mono text-xs">⚡</span>
+                          <span className="font-mono text-xs font-semibold text-ink group-hover/toggle:text-accent">
+                            {pluginsExpanded
+                              ? 'Hide Proprietary Plugins & Integrations'
+                              : 'Explore All 14 Proprietary Micro-Plugins & Bespoke Theme'}
+                          </span>
+                        </div>
+                        <span className="font-mono text-xs text-accent transition-transform duration-200">
+                          {pluginsExpanded ? '▲ Collapse' : '▼ View Breakdown (14)'}
+                        </span>
+                      </button>
+
+                      {pluginsExpanded && (
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">
+                          {proj.pluginHighlights.map((cat) => (
+                            <div
+                              key={cat.category}
+                              className="p-4 rounded-2xl bg-paper/90 border border-ink/10 space-y-3"
+                            >
+                              <h4 className="font-mono text-[11px] font-bold text-accent uppercase tracking-wider border-b border-ink/10 pb-1.5">
+                                {cat.category}
+                              </h4>
+                              <div className="space-y-2.5">
+                                {cat.items.map((item) => (
+                                  <div key={item.name} className="space-y-0.5">
+                                    <span className="font-mono text-xs font-semibold text-ink block">
+                                      {item.name}
+                                    </span>
+                                    <p className="font-sans text-[11px] text-ink-muted leading-relaxed">
+                                      {item.description}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
-                  <p className="font-sans text-ink-muted text-sm sm:text-base leading-relaxed mt-3">
-                    {proj.description}
-                  </p>
                 </div>
 
-                {/* Key Architecture Highlights */}
-                <div className="space-y-2 pt-2 border-t border-ink/10">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
-                    Architecture Highlights:
-                  </span>
-                  <ul className="space-y-1.5 text-xs font-sans text-ink/90">
-                    {proj.architecturePoints.map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <span className="text-accent mt-0.5">✦</span>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+                {/* Tech Stack Chips */}
+                <div className="pt-6 mt-6 border-t border-ink/10 flex flex-wrap gap-2">
+                  {proj.stack.map((t) => (
+                    <span
+                      key={t}
+                      className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
+                    >
+                      {t}
+                    </span>
+                  ))}
                 </div>
               </div>
-
-              {/* Tech Stack Chips */}
-              <div className="pt-6 mt-6 border-t border-ink/10 flex flex-wrap gap-2">
-                {proj.stack.map((t) => (
-                  <span
-                    key={t}
-                    className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
