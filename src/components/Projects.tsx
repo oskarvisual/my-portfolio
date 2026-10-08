@@ -8,64 +8,73 @@ interface Project {
   description: string;
   stack: string[];
   architecturePoints: string[];
+  url?: string;
+  urlLabel?: string;
 }
 
 const PROJECTS: Project[] = [
   {
     number: '01',
-    title: 'Omnichannel Apparel & Gear Platform',
-    clientType: 'High-Volume Enterprise Retailer',
-    highlightMetric: '$45M+ Annual GMV · 12,000+ Active SKUs',
+    title: 'bAInners – AI Image Banners',
+    clientType: 'Shopify App Store · Visual AI Commerce',
+    highlightMetric: '10x Faster Campaign Turnaround · Multi-Ratio AI Assets',
     description:
-      'High-volume multivariant storefront with real-time multi-warehouse inventory synchronization, automated fulfillment dispatch, and custom checkout flows reducing cart abandonment by 18%.',
+      'AI-powered promotional banner studio engineered for high-growth Shopify stores. Generates on-brand campaign banners, countdown timers, and announcement bars directly from store products in seconds without design agency turnaround bottlenecks.',
     architecturePoints: [
-      'Multi-warehouse synchronization with Finale Inventory',
-      'Automated batch label dispatch via ShipStation API',
-      'Custom Redis object caching layer handling high-traffic sales spikes',
+      'Shopify Theme App Extensions (Liquid App Blocks) for zero theme code pollution',
+      'Generative AI prompt synthesis pipeline with brand style presets & multi-aspect ratio rendering',
+      'Automated campaign scheduler, banner asset gallery manager, and real-time click-through analytics',
     ],
-    stack: ['WooCommerce', 'PHP 8.2', 'Redis', 'MySQL', 'Finale Inventory', 'ShipStation', 'Cloudflare'],
+    stack: ['Shopify App Bridge', 'React', 'Node.js', 'Generative AI', 'Liquid', 'PostgreSQL', 'Tailwind CSS'],
+    url: 'https://orivisdev.shop/app/bainners-ai-image-banners/',
+    urlLabel: 'View Live App',
   },
   {
     number: '02',
-    title: 'Global DTC Lifestyle & Fashion Storefront',
-    clientType: 'International DTC Brand (US/EU/LATAM)',
-    highlightMetric: 'Sub-800ms Global TTFB · 4 Currencies & Locales',
+    title: 'AI Product Questions & Answers',
+    clientType: 'Shopify App Store · Conversational Commerce',
+    highlightMetric: 'Automated Customer Inquiry Resolution · Conversion Uplift',
     description:
-      'Headless architecture built for international scale with instantaneous client-side navigation, localized currency routing, custom React bundle builder, and Algolia instant search.',
+      'Storefront AI concierge that resolves pre-purchase customer inquiries on product pages in real time. Automatically grounds answers in product specifications, catalog descriptions, and merchant policies to eliminate buyer hesitation.',
     architecturePoints: [
-      'Custom interactive bundle builder with dynamic pricing rules',
-      'Algolia instant autocomplete & facet filtering (<40ms latency)',
-      'Shopify Plus Checkout Extensions & custom pixel tracking',
+      'Grounding pipeline synthesizing instant answers from live product descriptions & vendor metafields',
+      'Merchant moderation dashboard with manual review queues, custom responses, and FAQ publishing',
+      'Ultra-lightweight embeddable storefront widgets with sub-50ms render overhead and conversion tracking',
     ],
-    stack: ['Shopify Plus', 'React', 'TypeScript', 'Tailwind CSS', 'Algolia', 'Liquid', 'Shopify CLI'],
+    stack: ['Shopify CLI', 'React', 'Node.js', 'OpenAI API', 'GraphQL Admin API', 'Redis', 'Shopify App Bridge'],
+    url: 'https://orivisdev.shop/app/ai-product-questions-answers/',
+    urlLabel: 'View Live App',
   },
   {
     number: '03',
-    title: 'B2B Wholesale & Industrial Supply Portal',
-    clientType: 'Industrial Distributor Network',
-    highlightMetric: '40k+ Wholesale Accounts · Real-time Credit Limits',
+    title: 'BrAIker – Trading Bot Fleet Control Room',
+    clientType: 'FinTech & Algorithmic Trading Platform',
+    highlightMetric: 'Deterministic Risk Gates · Multi-Agent Alpaca Fleet',
     description:
-      'Custom B2B ecommerce experience featuring tiered pricing matrices, company purchasing hierarchies, Net-30 invoice approvals, and bi-directional ERP order processing.',
+      'A multi-user paper-trading control room and autonomous bot fleet operations platform for US equities via Alpaca Paper. Combines deterministic execution signals, isolated virtual capital, strict survival gates, and complete trade auditability.',
     architecturePoints: [
-      'Tiered corporate account management & role-based procurement',
-      'Automated sync middleware handling 50k+ daily catalog webhook updates',
-      'Retool internal ops dashboard for customer service and credit overrides',
+      'Multi-bot execution engine with isolated capital boundaries and adaptive drawdown survival bands',
+      'Bot Manager operations interface with confirmation-first controls and real-time Telegram alerts',
+      'Scheduled global portfolio reconciliation, persistent scheduler leases, and mark-to-market performance tracking',
     ],
-    stack: ['BigCommerce B2B', 'Node.js', 'PostgreSQL', 'Docker', 'Retool', 'REST / GraphQL'],
+    stack: ['Next.js', 'TypeScript', 'Prisma ORM', 'MySQL 8', 'Alpaca API', 'Telegram Bot API', 'OpenAI API'],
+    url: 'https://github.com/oskarvisual/braiker',
+    urlLabel: 'View on GitHub',
   },
   {
     number: '04',
-    title: 'Automated Logistics & Return Portal (RMA)',
-    clientType: 'Internal Proprietary Operations Software',
-    highlightMetric: '60% Faster Return Cycle · Zero Manual Data Entry',
+    title: 'Wave Putaway Mobile App',
+    clientType: 'AT3 Tactical · Industrial Warehouse Mobile Software',
+    highlightMetric: '0% Placement Errors · 40%+ Dock-to-Stock Acceleration',
     description:
-      'Self-service customer return portal coupled with warehouse scanning terminal app. Automates label generation, barcode verification, inventory restocking, and refund payouts.',
+      'Ruggedized mobile warehouse station engineered on Retool Mobile and Zebra terminals. Guides warehouse operators through fail-safe 3-step putaway workflows with real-time transactional ERP inventory synchronization.',
     architecturePoints: [
-      'Customer self-service portal generating prepaid ShipStation return labels',
-      'Warehouse tablet scanning interface for instant inventory triage',
-      'Automated Stripe refund triggers tied to warehouse scan confirmation',
+      'Native Zebra DataWedge laser scanning with instant burst barcode verification (RCV Cart ➔ SKU ➔ Bin ID)',
+      '3-phase idempotent sync (prepare ➔ confirm ➔ transferred) guaranteeing zero duplicated ERP transfers',
+      'Session takeover protocol between shifts and live telemetry health dashboard (API, DB, Redis, Finale)',
     ],
-    stack: ['React', 'Python / FastAPI', 'PostgreSQL', 'ShipStation API', 'Stripe API', 'Tailwind CSS'],
+    stack: ['Retool Mobile', 'Zebra DataWedge', 'Finale Inventory API', 'PostgreSQL', 'Redis', 'Node.js / REST Webhooks'],
+    urlLabel: 'Enterprise Operations',
   },
 ];
 
@@ -103,13 +112,35 @@ export const Projects: React.FC = () => {
             >
               <div className="space-y-6">
                 {/* Header row */}
-                <div className="flex items-center justify-between border-b border-ink/10 pb-4">
+                <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
                   <span className="font-mono text-2xl font-light text-accent">
                     {proj.number}
                   </span>
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
-                    {proj.clientType}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+                      {proj.clientType}
+                    </span>
+                    {proj.url ? (
+                      <a
+                        href={proj.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${proj.urlLabel || 'View Project'}: ${proj.title}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 hover:bg-accent hover:text-paper text-ink transition-all border border-ink/10 hover:border-accent ml-1 group/btn"
+                      >
+                        <span>{proj.urlLabel || 'View'}</span>
+                        <span className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5">
+                          ↗
+                        </span>
+                      </a>
+                    ) : (
+                      proj.urlLabel && (
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 text-ink-muted border border-ink/10 ml-1">
+                          {proj.urlLabel}
+                        </span>
+                      )
+                    )}
+                  </div>
                 </div>
 
                 {/* Metric pill */}
@@ -119,9 +150,22 @@ export const Projects: React.FC = () => {
 
                 {/* Title & Description */}
                 <div>
-                  <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
-                    {proj.title}
-                  </h3>
+                  {proj.url ? (
+                    <a
+                      href={proj.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/title inline-block"
+                    >
+                      <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover/title:text-accent transition-colors">
+                        {proj.title}
+                      </h3>
+                    </a>
+                  ) : (
+                    <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
+                      {proj.title}
+                    </h3>
+                  )}
                   <p className="font-sans text-ink-muted text-sm sm:text-base leading-relaxed mt-3">
                     {proj.description}
                   </p>
