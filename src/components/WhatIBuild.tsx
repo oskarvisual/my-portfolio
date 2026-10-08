@@ -290,9 +290,6 @@ export const WhatIBuild: React.FC = () => {
                           </h3>
                         </div>
                       </div>
-                      <span className="font-mono text-xs text-accent bg-accent/10 px-3 py-1 rounded-full font-medium">
-                        Active Stage 0{idx + 1}
-                      </span>
                     </div>
 
                     {/* Middle Grid: Narrative Copy Left (5 cols), 16:9 Video Right (7 cols) */}
