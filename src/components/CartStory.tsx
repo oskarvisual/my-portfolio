@@ -127,9 +127,9 @@ export const CartStory: React.FC = () => {
           1.5
         );
       } else {
-        // Desktop: Cart centered in left column, normal scale; floor at normal scale
+        // Desktop: Cart centered in left column via Flexbox, normal scale; floor at normal scale
         gsap.set(cartWrapperRef.current, {
-          xPercent: -50,
+          xPercent: 0,
           scale: 1.0,
           clearProps: 'transformOrigin',
         });
@@ -368,14 +368,14 @@ export const CartStory: React.FC = () => {
         {/* ================================================================= */}
         <div
           ref={cartWrapperRef}
-          className="absolute left-1/2 md:left-[24%] lg:left-[23%] xl:left-[22.5%] bottom-0 z-20 will-change-transform drop-shadow-[0_20px_45px_rgba(0,0,0,0.22)] select-none pointer-events-auto"
+          className="absolute bottom-0 z-20 left-1/2 md:left-0 md:w-[48%] lg:w-[46%] xl:w-[45%] md:flex md:justify-center md:items-end will-change-transform drop-shadow-[0_20px_45px_rgba(0,0,0,0.22)] select-none pointer-events-auto"
           style={{
             backfaceVisibility: 'hidden',
           }}
         >
           <div
             ref={cartInnerRef}
-            className="relative w-[195px] sm:w-[270px] md:w-[400px] lg:w-[480px] xl:w-[540px]"
+            className="relative w-[195px] sm:w-[270px] md:w-[340px] lg:w-[410px] xl:w-[470px] 2xl:w-[510px] md:max-w-[85%]"
           >
             {/* Cart Top-down Image */}
             <img
