@@ -195,8 +195,9 @@
       <path
         d="M 28.818913,4.80325 h 14.862142 c 1.66928,0 3.013252,1.343978 3.013252,3.0132527 0,1.6692748 -1.343972,3.0132533 -3.013252,3.0132533 H 28.818913 c -1.66927,0 -3.012736,-1.3439785 -3.012736,-3.0132533 0,-1.6692747 1.343466,-3.0132527 3.012736,-3.0132527 z"
         fill="#ffffff" />
-    </mask></defs><g
-     id="layer2"
+    </mask><clipPath id="buttonsExteriorClip"><rect x="-20" y="-20" width="20.446567" height="190" /><rect x="72.053483" y="-20" width="20" height="190" /></clipPath></defs><g
+     id="layer2" clip-path="url(#buttonsExteriorClip)"
+     mask="url(#screenCutout)"
      style="display:inline"><g
        id="g14"><rect
          style="fill:url(#linearGradient14);fill-opacity:1;stroke-width:0.2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.542522;paint-order:stroke fill markers"
