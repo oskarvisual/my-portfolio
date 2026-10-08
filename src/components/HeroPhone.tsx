@@ -33,7 +33,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
   const [copied, setCopied] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const FADE_OUT_DURATION = 1.5; // seconds for smooth audio/video fade-out
+  const FADE_OUT_DURATION = 0.5; // seconds for smooth audio/video fade-out
 
   // Synchronize clock every second with actual system time
   useEffect(() => {
@@ -44,7 +44,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  // Smooth audio volume and video fade to black over the last 1.5 seconds
+  // Smooth audio volume and video fade to black over the last 0.5 seconds
   useEffect(() => {
     if (playbackState !== 'playing') {
       return;
@@ -59,7 +59,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
       if (!video.paused && !video.ended && video.duration && !isNaN(video.duration)) {
         const remaining = video.duration - video.currentTime;
         if (remaining <= FADE_OUT_DURATION) {
-          // Progress from 0 (at 1.5s remaining) to 1 (at end)
+          // Progress from 0 (at 0.5s remaining) to 1 (at end)
           const progress = Math.max(0, Math.min(1, 1 - remaining / FADE_OUT_DURATION));
 
           // Audio fade-out: smoothly decrease volume to 0
@@ -210,7 +210,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         />
 
         {/* ================================================================= */}
-        {/* SMOOTH FADE-TO-BLACK OVERLAY (Last 1.5 seconds)                   */}
+        {/* SMOOTH FADE-TO-BLACK OVERLAY (Last 0.5 seconds)                   */}
         {/* ================================================================= */}
         <div
           className="absolute inset-0 bg-black pointer-events-none z-[15] will-change-opacity"
