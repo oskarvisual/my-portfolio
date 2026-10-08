@@ -9,14 +9,37 @@ interface HeroPhoneProps {
   className?: string;
 }
 
+const getSystemTime = () => {
+  const now = new Date();
+  return now
+    .toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+    .replace(/\s*(AM|PM|a\.\s?m\.|p\.\s?m\.)/gi, '')
+    .trim();
+};
+
 export const HeroPhone: React.FC<HeroPhoneProps> = ({
   videoSrc = myPresentationVideo,
   className = '',
 }) => {
+  // Live system time displayed on iPhone top status bar
+  const [systemTime, setSystemTime] = useState<string>(() => getSystemTime());
+
   // Playback lifecycle: 'idle' (waiting to play) | 'playing' | 'ended' (finished)
   const [playbackState, setPlaybackState] = useState<'idle' | 'playing' | 'ended'>('idle');
   const [copied, setCopied] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Synchronize clock every second with actual system time
+  useEffect(() => {
+    setSystemTime(getSystemTime());
+    const interval = setInterval(() => {
+      setSystemTime(getSystemTime());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Force video first frame rendering on mount
   useEffect(() => {
@@ -127,10 +150,10 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         />
 
         {/* ================================================================= */}
-        {/* iOS Top Status Bar (9:41, Cellular, 5G, Battery)                  */}
+        {/* iOS Top Status Bar (System Time, Cellular, 5G, Battery)         */}
         {/* ================================================================= */}
         <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/90 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none drop-shadow">
-          <span className="font-semibold text-white">9:41</span>
+          <span className="font-semibold text-white tracking-normal">{systemTime}</span>
           <div className="flex items-center gap-1.5 text-white/90">
             {/* Cellular signal */}
             <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 16 16">
