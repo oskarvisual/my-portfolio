@@ -140,7 +140,7 @@ const PROJECTS: Project[] = [
     number: '06',
     title: 'Wave Putaway Mobile App',
     clientType: 'AT3 Tactical · Industrial Warehouse Mobile Software',
-    highlightMetric: '0% Placement Errors · 40%+ Dock-to-Stock Acceleration',
+    highlightMetric: '0% Placement Errors · 50% Dock-to-Stock Acceleration',
     description:
       'Ruggedized mobile warehouse station engineered on Retool Mobile and Zebra terminals. Guides warehouse operators through fail-safe 3-step putaway workflows with real-time transactional ERP inventory synchronization.',
     architecturePoints: [
