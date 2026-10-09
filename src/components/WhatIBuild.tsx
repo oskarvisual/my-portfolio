@@ -14,9 +14,10 @@ interface VideoStageProps {
   src: string;
   isActive: boolean;
   title: string;
+  shouldPreload?: boolean;
 }
 
-const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title }) => {
+const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title, shouldPreload = true }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,24 +29,31 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title }) => {
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
 
-    const playFromStart = () => {
+    const startPlayback = () => {
       try {
         video.currentTime = 0;
         const playPromise = video.play();
         if (playPromise !== undefined) {
-          playPromise.catch(() => {});
+          playPromise.catch((err) => {
+            console.warn('Video play deferred:', err);
+          });
         }
-      } catch {
-        // Fallback catch
+      } catch (err) {
+        console.warn('Video play error:', err);
       }
     };
 
     if (isActive) {
-      if (video.readyState >= 1) {
-        playFromStart();
+      if (video.readyState >= 2) {
+        startPlayback();
       } else {
-        video.addEventListener('loadeddata', playFromStart, { once: true });
-        video.addEventListener('canplay', playFromStart, { once: true });
+        video.addEventListener('canplay', startPlayback, { once: true });
+        video.addEventListener('loadeddata', startPlayback, { once: true });
+        // Call play directly to command the browser to load and buffer the media
+        const p = video.play();
+        if (p !== undefined) {
+          p.catch(() => {});
+        }
       }
     } else {
       video.pause();
@@ -53,7 +61,7 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title }) => {
         video.currentTime = 0;
       } catch {}
     }
-  }, [isActive]);
+  }, [isActive, src]);
 
   return (
     <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#f5f3ee] border border-ink/10 shadow-sm flex items-center justify-center">
@@ -63,7 +71,7 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title }) => {
         muted
         playsInline
         loop={false}
-        preload="none"
+        preload={isActive || shouldPreload ? 'auto' : 'none'}
         className="w-full h-full object-contain block bg-[#f5f3ee]"
         aria-label={`Demonstration video for ${title}`}
       >
@@ -133,12 +141,33 @@ const SERVICES_DATA: ServiceData[] = [
 
 export const WhatIBuild: React.FC = () => {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [isSectionNear, setIsSectionNear] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const isProgrammaticScrollRef = useRef(false);
 
   const programmaticTimeoutRef = useRef<number | null>(null);
+
+  // Preload videos smoothly when approaching this section (400px margin)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsSectionNear(true);
+          }
+        });
+      },
+      { rootMargin: '400px 0px' }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
@@ -323,6 +352,7 @@ export const WhatIBuild: React.FC = () => {
                           src={service.videoSrc}
                           isActive={isExpanded}
                           title={service.title}
+                          shouldPreload={isSectionNear}
                         />
                       </div>
                     </div>
@@ -392,6 +422,7 @@ export const WhatIBuild: React.FC = () => {
                         src={service.videoSrc}
                         isActive={isExpanded}
                         title={service.title}
+                        shouldPreload={isSectionNear}
                       />
                     </div>
                   </div>
@@ -400,6 +431,15 @@ export const WhatIBuild: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Hidden Preloader: prime metadata for adjacent capability videos once approaching section */}
+        {isSectionNear && (
+          <div className="hidden" aria-hidden="true">
+            {SERVICES_DATA.filter((_, i) => i !== activeIdx).map((s) => (
+              <video key={`preload-${s.id}`} src={s.videoSrc} preload="auto" muted playsInline />
+            ))}
+          </div>
+        )}
 
         {/* Footer Navigation Tabs for Manual Jump */}
         <div className="max-w-7xl mx-auto w-full flex items-center justify-center gap-2 pt-4">

@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
 import myPresentationVideo from '../assets/videos/my-presentation.mp4';
+import myPresentationPosterWebp from '../assets/images/my-presentation.webp';
+import myPresentationPosterPng from '../assets/images/my-presentation.png';
 import cvPdf from '../assets/docs/cv.pdf';
 import { getCdnVideoUrl, getCdnImageUrl } from '../utils/cdn';
 
 const defaultPresentationVideo = getCdnVideoUrl(myPresentationVideo, 'my-presentation.mp4');
+const defaultPresentationPoster = getCdnImageUrl(myPresentationPosterWebp, 'my-presentation.webp');
 const resolvedIphoneFrame = getCdnImageUrl(iphoneFrame, 'iphone-17.svg');
 
 interface HeroPhoneProps {
@@ -90,25 +93,6 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
     };
   }, [playbackState]);
 
-  // Force video first frame rendering on mount
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleReady = () => {
-      try {
-        if (video.currentTime === 0) {
-          video.currentTime = 0.001;
-        }
-      } catch {}
-    };
-
-    if (video.readyState >= 1) {
-      handleReady();
-    } else {
-      video.addEventListener('loadeddata', handleReady, { once: true });
-    }
-  }, [videoSrc]);
 
   // Start video playback with unmuted sound
   const handleStartPlay = () => {
@@ -199,10 +183,29 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         }}
       >
         {/* ================================================================= */}
+        {/* IDLE POSTER IMAGE (Crisp first frame before video playback)      */}
+        {/* ================================================================= */}
+        {playbackState === 'idle' && (
+          <img
+            src={defaultPresentationPoster}
+            alt="Oscar Fernandez Presentation Preview"
+            className="absolute inset-0 w-full h-full object-cover block z-[5] pointer-events-none"
+            width={720}
+            height={1280}
+            onError={(e) => {
+              if (e.currentTarget.src !== myPresentationPosterPng) {
+                e.currentTarget.src = myPresentationPosterPng;
+              }
+            }}
+          />
+        )}
+
+        {/* ================================================================= */}
         {/* FULL VERTICAL SCREEN VIDEO                                        */}
         {/* ================================================================= */}
         <video
           ref={videoRef}
+          poster={defaultPresentationPoster}
           src={`${videoSrc}#t=0.001`}
           playsInline
           preload="none"
@@ -234,7 +237,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         {/* ================================================================= */}
         {/* iOS Top Status Bar (System Time, Cellular, 5G, Battery)         */}
         {/* ================================================================= */}
-        <div className="relative z-10 w-full px-5 pt-2.5 flex items-center justify-between text-white/90 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none drop-shadow">
+        <div className="relative z-20 w-full px-5 pt-2.5 flex items-center justify-between text-white/90 text-[9px] font-sans font-medium tracking-tight select-none pointer-events-none drop-shadow">
           <span className="font-semibold text-white tracking-normal">{systemTime}</span>
           <div className="flex items-center gap-1.5 text-white/90">
             {/* Cellular signal */}
@@ -258,7 +261,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
         {playbackState === 'idle' && (
           <div
             onClick={handleStartPlay}
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center cursor-pointer bg-black/40 hover:bg-black/30 transition-all group"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center cursor-pointer bg-black/40 hover:bg-black/30 transition-all group"
             aria-label="Play presentation video with sound"
           >
             {/* Perfectly centered official YouTube SVG badge */}

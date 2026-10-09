@@ -137,6 +137,7 @@ export const IndustryStages: React.FC = () => {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false); // Default unmuted as requested ("con sonido")
   const [isSectionInView, setIsSectionInView] = useState(false);
+  const [isNearSection, setIsNearSection] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
@@ -183,6 +184,26 @@ export const IndustryStages: React.FC = () => {
     return () => mm.revert();
   }, []);
 
+  // Near-viewport observer: initiates preloading chunks when scrolling near this section (400px margin)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsNearSection(true);
+          }
+        });
+      },
+      { rootMargin: '400px 0px' }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   // Universal viewport observer: guarantees pause when leaving section on mobile or desktop
   useEffect(() => {
     const container = containerRef.current;
@@ -225,20 +246,30 @@ export const IndustryStages: React.FC = () => {
       video.muted = isMuted;
 
       if (idx === activeStageIndex && isSectionInView) {
-        try {
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch((err) => {
-              // If browser autoplay policy blocks unmuted playback before user interaction,
-              // fallback gracefully to muted playback so the video doesn't stall
-              if (!video.muted) {
-                console.warn('Browser blocked unmuted autoplay policy, playing muted fallback:', err);
-                video.muted = true;
-                video.play().catch(() => {});
-              }
-            });
-          }
-        } catch {}
+        const startPlay = () => {
+          try {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+              playPromise.catch((err) => {
+                // If browser autoplay policy blocks unmuted playback before user interaction,
+                // fallback gracefully to muted playback so the video doesn't stall
+                if (!video.muted) {
+                  console.warn('Browser blocked unmuted autoplay policy, playing muted fallback:', err);
+                  video.muted = true;
+                  video.play().catch(() => {});
+                }
+              });
+            }
+          } catch {}
+        };
+
+        if (video.readyState >= 2) {
+          startPlay();
+        } else {
+          video.addEventListener('canplay', startPlay, { once: true });
+          video.addEventListener('loadeddata', startPlay, { once: true });
+          startPlay();
+        }
       } else {
         video.pause();
       }
@@ -404,7 +435,7 @@ export const IndustryStages: React.FC = () => {
                       webkit-playsinline="true"
                       muted={isMuted}
                       loop={false}
-                      preload="none"
+                      preload={idx === activeStageIndex || isNearSection ? 'auto' : 'none'}
                       onEnded={() => {
                         // Freezes gracefully on the last frame as requested
                         const v = videoRefs.current[idx];

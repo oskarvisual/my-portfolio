@@ -143,6 +143,19 @@ async function optimizeImages() {
       .toFile(otwWebp);
     console.log('   ✅ open-to-work.webp generated');
   }
+
+  // 4. my-presentation.png -> my-presentation.webp
+  const presPng = path.join(imagesDir, 'my-presentation.png');
+  const presWebp = path.join(imagesDir, 'my-presentation.webp');
+  if (fs.existsSync(presPng) && (!fs.existsSync(presWebp) || fs.statSync(presPng).mtimeMs > fs.statSync(presWebp).mtimeMs)) {
+    console.log('   Converting my-presentation.png to WebP (q85, effort 6)...');
+    await sharp(presPng)
+      .webp({ quality: 85, effort: 6 })
+      .toFile(presWebp);
+    const oldSz = (fs.statSync(presPng).size / 1024).toFixed(1);
+    const newSz = (fs.statSync(presWebp).size / 1024).toFixed(1);
+    console.log(`   ✅ my-presentation.webp generated: ${oldSz} KB -> ${newSz} KB`);
+  }
 }
 
 async function uploadImages() {
