@@ -214,8 +214,10 @@ export const IndustryStages: React.FC = () => {
     }
   }, [activeStageIndex]);
 
-  // Video playback management: play active video when in view, pause when scrolled away
+  // Video playback management: play active video when in view, pause when scrolled away (Desktop only)
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) return;
+
     videoRefs.current.forEach((video, idx) => {
       if (!video) return;
 
@@ -330,13 +332,13 @@ export const IndustryStages: React.FC = () => {
         </div>
 
         {/* =================================================================== */}
-        {/* MAIN STAGE & ACTIVE INDUSTRY CARD (2 COLUMNS, EQUAL HEIGHT)          */}
+        {/* MAIN STAGE & ACTIVE INDUSTRY CARD (2 COLUMNS ON DESKTOP, CARD ONLY ON MOBILE) */}
         {/* =================================================================== */}
         <div className="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-stretch my-auto py-2">
           {/* ----------------------------------------------------------------- */}
-          {/* LEFT: PURE VIDEO FRAMED WITH PLOMO BORDER (Matches right card height) */}
+          {/* LEFT: PURE VIDEO FRAMED WITH PLOMO BORDER (Desktop Only: hidden lg:flex) */}
           {/* ----------------------------------------------------------------- */}
-          <div className="lg:col-span-4 flex justify-center items-stretch">
+          <div className="hidden lg:flex lg:col-span-4 justify-center items-stretch">
             <div
               onClick={toggleAudio}
               title="Click to toggle sound"
@@ -421,9 +423,9 @@ export const IndustryStages: React.FC = () => {
           </div>
 
           {/* ----------------------------------------------------------------- */}
-          {/* RIGHT: SINGLE ACTIVE INDUSTRY CARD (Changes smoothly on scroll/click) */}
+          {/* RIGHT: SINGLE ACTIVE INDUSTRY CARD (Desktop: 8 cols, Mobile: full width) */}
           {/* ----------------------------------------------------------------- */}
-          <div className="lg:col-span-8 flex flex-col justify-stretch">
+          <div className="w-full lg:col-span-8 flex flex-col justify-stretch">
             <div
               key={activeVertical.id}
               className="rounded-3xl border border-ink/15 bg-warm-50/90 shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between h-full animate-fade-in transition-all duration-300"
