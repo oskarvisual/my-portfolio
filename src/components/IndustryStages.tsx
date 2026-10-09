@@ -261,6 +261,48 @@ export const IndustryStages: React.FC = () => {
     });
   };
 
+  // Mobile swipe gestures (swipe left = next, swipe right = prev)
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartXRef.current;
+    const deltaY = touchEndY - touchStartYRef.current;
+
+    // Must be predominantly horizontal and exceed threshold (35px)
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        // Swipe Left -> Next
+        if (activeStageIndex < INDUSTRY_VERTICALS.length - 1) {
+          handleSelectStage(activeStageIndex + 1);
+        }
+      } else {
+        // Swipe Right -> Prev
+        if (activeStageIndex > 0) {
+          handleSelectStage(activeStageIndex - 1);
+        }
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+  };
+
+  const handleTouchCancel = () => {
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+  };
+
   // Programmatic jump to a specific industry stage (via arrows or pagination dots)
   const handleSelectStage = (idx: number) => {
     const boundedIdx = Math.max(0, Math.min(INDUSTRY_VERTICALS.length - 1, idx));
@@ -425,7 +467,44 @@ export const IndustryStages: React.FC = () => {
           {/* ----------------------------------------------------------------- */}
           {/* RIGHT: SINGLE ACTIVE INDUSTRY CARD (Desktop: 8 cols, Mobile: full width) */}
           {/* ----------------------------------------------------------------- */}
-          <div className="w-full lg:col-span-8 flex flex-col justify-stretch">
+          <div
+            className="w-full lg:col-span-8 flex flex-col justify-stretch touch-pan-y"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchCancel}
+          >
+            {/* Mobile-Only Navigation Bar: Arrows & Stage Counter placed directly above the card */}
+            <div className="flex lg:hidden items-center justify-between pb-3.5 select-none">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
+                  STAGE {activeVertical.number} / 0{INDUSTRY_VERTICALS.length}
+                </span>
+                <span className="font-mono text-[10px] text-ink-muted">
+                  · Swipe left/right
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSelectStage(activeStageIndex - 1)}
+                  disabled={activeStageIndex === 0}
+                  aria-label="Previous industry"
+                  className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm bg-warm-100 hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors shadow-2xs"
+                >
+                  ←
+                </button>
+                <button
+                  onClick={() => handleSelectStage(activeStageIndex + 1)}
+                  disabled={activeStageIndex === INDUSTRY_VERTICALS.length - 1}
+                  aria-label="Next industry"
+                  className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm bg-warm-100 hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors shadow-2xs"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+
             <div
               key={activeVertical.id}
               className="rounded-3xl border border-ink/15 bg-warm-50/90 shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between h-full animate-fade-in transition-all duration-300"
@@ -539,7 +618,8 @@ export const IndustryStages: React.FC = () => {
               )}
             </span>
 
-            <div className="flex items-center gap-1.5">
+            {/* Desktop-Only Arrows (On mobile, arrows are situated above the card) */}
+            <div className="hidden lg:flex items-center gap-1.5">
               <button
                 onClick={() => handleSelectStage(activeStageIndex - 1)}
                 disabled={activeStageIndex === 0}
