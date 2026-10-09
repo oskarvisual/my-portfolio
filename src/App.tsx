@@ -7,6 +7,7 @@ import { CartStory } from './components/CartStory';
 import { WhatIBuild } from './components/WhatIBuild';
 import { Projects } from './components/Projects';
 import { ExperienceTimeline } from './components/ExperienceTimeline';
+import { IndustryStages } from './components/IndustryStages';
 import { ImpactStats } from './components/ImpactStats';
 import { Footer } from './components/Footer';
 
@@ -52,7 +53,10 @@ export const App: React.FC = () => {
         {/* 6. CV & 15+ Years Timeline */}
         <ExperienceTimeline />
 
-        {/* 7. Proof in Numbers & Impact Metrics */}
+        {/* 7. Cross-Industry Domain Expertise */}
+        <IndustryStages />
+
+        {/* 8. Proof in Numbers & Impact Metrics */}
         <ImpactStats />
       </main>
 

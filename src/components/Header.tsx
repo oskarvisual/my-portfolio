@@ -53,6 +53,7 @@ export const Header: React.FC = () => {
             { label: 'Capabilities', target: 'what-i-build' },
             { label: 'Projects', target: 'projects' },
             { label: 'Experience', target: 'experience' },
+            { label: 'Industries', target: 'industries' },
             { label: 'Contact', target: 'contact' },
           ].map((item) => (
             <button
@@ -108,6 +109,7 @@ export const Header: React.FC = () => {
             { label: 'Capabilities', target: 'what-i-build' },
             { label: 'Projects', target: 'projects' },
             { label: 'Experience', target: 'experience' },
+            { label: 'Industries', target: 'industries' },
             { label: 'Contact', target: 'contact' },
           ].map((item) => (
             <div key={item.label}>
