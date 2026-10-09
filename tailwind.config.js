@@ -26,8 +26,8 @@ export default {
           faint: '#D4D1CA',
         },
         accent: {
-          DEFAULT: '#BD532B', // Editorial terracotta / copper
-          dark: '#9E3F1C',
+          DEFAULT: '#9E3F1C', // Accessible editorial terracotta (contrast ratio > 5.1:1 on paper)
+          dark: '#833417',
           light: '#F4EAE4',
         }
       },

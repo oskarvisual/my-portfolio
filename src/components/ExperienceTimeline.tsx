@@ -351,6 +351,8 @@ export const ExperienceTimeline: React.FC = () => {
                     <div className="shrink-0">
                       <img
                         src={resolvedOpenToWorkImg}
+                        width={150}
+                        height={150}
                         onError={(e) => {
                           if (e.currentTarget.src !== openToWorkWebp) {
                             e.currentTarget.src = openToWorkWebp;

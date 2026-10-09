@@ -384,6 +384,8 @@ export const CartStory: React.FC = () => {
             {/* Cart Top-down Image */}
             <img
               src={resolvedCartImage}
+              width={1143}
+              height={1442}
               onError={(e) => {
                 if (e.currentTarget.src !== cartWebp) {
                   e.currentTarget.src = cartWebp;

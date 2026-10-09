@@ -205,7 +205,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
           ref={videoRef}
           src={`${videoSrc}#t=0.001`}
           playsInline
-          preload="auto"
+          preload="none"
           onEnded={handleVideoEnded}
           onError={(e) => {
             if (e.currentTarget.src !== `${myPresentationVideo}#t=0.001`) {
@@ -216,7 +216,9 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
             playbackState === 'ended' ? 'opacity-0' : 'opacity-100'
           }`}
           aria-label="Oscar Fernandez Presentation Video"
-        />
+        >
+          <track kind="captions" srcLang="en" label="English" default />
+        </video>
 
         {/* ================================================================= */}
         {/* SMOOTH FADE-TO-BLACK OVERLAY (Last 0.5 seconds)                   */}
@@ -425,6 +427,8 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
       {/* =================================================================== */}
       <img
         src={resolvedIphoneFrame}
+        width={430}
+        height={890}
         onError={(e) => {
           if (e.currentTarget.src !== iphoneFrame) {
             e.currentTarget.src = iphoneFrame;

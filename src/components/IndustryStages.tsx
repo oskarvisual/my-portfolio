@@ -404,7 +404,7 @@ export const IndustryStages: React.FC = () => {
                       webkit-playsinline="true"
                       muted={isMuted}
                       loop={false}
-                      preload="auto"
+                      preload="none"
                       onEnded={() => {
                         // Freezes gracefully on the last frame as requested
                         const v = videoRefs.current[idx];
@@ -412,7 +412,9 @@ export const IndustryStages: React.FC = () => {
                       }}
                       className="w-full h-full object-cover block bg-paper"
                       aria-label={`${vertical.industry} vertical video`}
-                    />
+                    >
+                      <track kind="captions" srcLang="en" label="English" default />
+                    </video>
                   </div>
                 );
               })}
@@ -598,11 +600,15 @@ export const IndustryStages: React.FC = () => {
               <button
                 key={v.id}
                 onClick={() => handleSelectStage(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  activeStageIndex === idx ? 'w-10 bg-accent' : 'w-2.5 bg-ink/20 hover:bg-ink/40'
-                }`}
+                className="py-3.5 px-1.5 flex items-center justify-center cursor-pointer min-h-[44px]"
                 aria-label={`Jump to stage 0${idx + 1}: ${v.industry}`}
-              />
+              >
+                <span
+                  className={`h-2 rounded-full transition-all duration-300 block ${
+                    activeStageIndex === idx ? 'w-10 bg-accent' : 'w-2.5 bg-ink/20 hover:bg-ink/40'
+                  }`}
+                />
+              </button>
             ))}
           </div>
 

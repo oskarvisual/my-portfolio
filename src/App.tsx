@@ -13,11 +13,19 @@ import { Footer } from './components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Prevent forced layout thrashing & reflow by batching callbacks
+ScrollTrigger.config({
+  limitCallbacks: true,
+  autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load',
+});
+
 export const App: React.FC = () => {
   useEffect(() => {
-    // Refresh ScrollTrigger once fonts and assets are loaded
+    // Refresh ScrollTrigger safely in next animation frame once DOM & fonts settle
     const handleLoad = () => {
-      ScrollTrigger.refresh();
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
     };
 
     window.addEventListener('load', handleLoad);

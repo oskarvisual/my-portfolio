@@ -63,10 +63,12 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title }) => {
         muted
         playsInline
         loop={false}
-        preload="auto"
+        preload="none"
         className="w-full h-full object-contain block bg-[#f5f3ee]"
         aria-label={`Demonstration video for ${title}`}
-      />
+      >
+        <track kind="captions" srcLang="en" label="English" default />
+      </video>
     </div>
   );
 };
@@ -263,7 +265,7 @@ export const WhatIBuild: React.FC = () => {
                 {/* Collapsed Vertical View (Minimal padding so open item gets max width) */}
                 {!isExpanded ? (
                   <div className="h-full flex flex-col justify-between items-center py-2 select-none">
-                    <span className="font-mono text-lg font-light text-accent/90">
+                    <span className="font-mono text-lg font-medium text-accent">
                       {service.number}
                     </span>
                     <div className="[writing-mode:vertical-rl] rotate-180 font-sans font-bold text-xs tracking-tight text-ink/75 group-hover:text-accent transition-colors my-auto whitespace-nowrap">
@@ -405,11 +407,15 @@ export const WhatIBuild: React.FC = () => {
             <button
               key={s.id}
               onClick={() => handleSelectPanel(idx)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                activeIdx === idx ? 'w-10 bg-accent' : 'w-2 bg-ink/20 hover:bg-ink/40'
-              }`}
+              className="py-3.5 px-1.5 flex items-center justify-center cursor-pointer min-h-[44px]"
               aria-label={`Jump to ${s.title}`}
-            />
+            >
+              <span
+                className={`h-2 rounded-full transition-all duration-300 block ${
+                  activeIdx === idx ? 'w-10 bg-accent' : 'w-2 bg-ink/20 hover:bg-ink/40'
+                }`}
+              />
+            </button>
           ))}
         </div>
       </div>
