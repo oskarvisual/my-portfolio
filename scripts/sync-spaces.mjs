@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 import {
   S3Client,
   PutBucketCorsCommand,
@@ -39,15 +40,21 @@ if (!DO_SPACES_KEY || !DO_SPACES_SECRET || !DO_SPACES_BUCKET) {
 }
 
 const cleanDestDir = DO_SPACES_DEST_DIR.replace(/^\/+|\/+$/g, '');
-const endpoint = `https://${DO_SPACES_REGION}.digitaloceanspaces.com`;
-const cdnBase = `https://${DO_SPACES_BUCKET}.${DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${cleanDestDir}`;
+const projectRoot = cleanDestDir.replace(/\/?(videos|images).*$/, '') || 'my-portfolio';
+const videosDestDir = `${projectRoot}/videos`;
+const imagesDestDir = `${projectRoot}/images`;
 
-console.log('🚀 DigitalOcean Spaces Sync & Setup');
-console.log('  • Bucket:      ', DO_SPACES_BUCKET);
-console.log('  • Region:      ', DO_SPACES_REGION);
-console.log('  • Destination: ', cleanDestDir);
-console.log('  • Endpoint:    ', endpoint);
-console.log('  • CDN URL:     ', cdnBase);
+const endpoint = `https://${DO_SPACES_REGION}.digitaloceanspaces.com`;
+const cdnBase = `https://${DO_SPACES_BUCKET}.${DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${projectRoot}`;
+
+console.log('🚀 DigitalOcean Spaces Media Sync & Setup');
+console.log('  • Bucket:        ', DO_SPACES_BUCKET);
+console.log('  • Region:        ', DO_SPACES_REGION);
+console.log('  • Project Root:  ', projectRoot);
+console.log('  • Videos Dest:   ', videosDestDir);
+console.log('  • Images Dest:   ', imagesDestDir);
+console.log('  • Endpoint:      ', endpoint);
+console.log('  • CDN URL:       ', cdnBase);
 console.log('----------------------------------------------------');
 
 if (process.env.GITHUB_ENV) {
@@ -92,6 +99,109 @@ async function configureCors() {
   }
 }
 
+async function optimizeImages() {
+  const imagesDir = path.resolve('src/assets/images');
+  if (!fs.existsSync(imagesDir)) return;
+
+  console.log('\n🎨 Optimizing images to high-performance WebP format...');
+
+  // 1. floor.jpg (Seamless background pattern) -> floor.webp
+  const floorJpg = path.join(imagesDir, 'floor.jpg');
+  const floorWebp = path.join(imagesDir, 'floor.webp');
+  if (fs.existsSync(floorJpg) && (!fs.existsSync(floorWebp) || fs.statSync(floorJpg).mtimeMs > fs.statSync(floorWebp).mtimeMs)) {
+    console.log('   Converting floor.jpg to 1600x1600 WebP (q78)...');
+    await sharp(floorJpg)
+      .resize(1600, 1600, { fit: 'inside' })
+      .webp({ quality: 78, effort: 6 })
+      .toFile(floorWebp);
+    const oldSz = (fs.statSync(floorJpg).size / 1024).toFixed(1);
+    const newSz = (fs.statSync(floorWebp).size / 1024).toFixed(1);
+    console.log(`   ✅ floor.webp generated: ${oldSz} KB -> ${newSz} KB`);
+  }
+
+  // 2. cart.png (Shopping cart with alpha) -> cart.webp
+  const cartPng = path.join(imagesDir, 'cart.png');
+  const cartWebp = path.join(imagesDir, 'cart.webp');
+  if (fs.existsSync(cartPng) && (!fs.existsSync(cartWebp) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartWebp).mtimeMs)) {
+    console.log('   Converting cart.png to transparent WebP (q85, effort 6)...');
+    await sharp(cartPng)
+      .webp({ quality: 85, effort: 6 })
+      .toFile(cartWebp);
+    const oldSz = (fs.statSync(cartPng).size / 1024).toFixed(1);
+    const newSz = (fs.statSync(cartWebp).size / 1024).toFixed(1);
+    console.log(`   ✅ cart.webp generated: ${oldSz} KB -> ${newSz} KB`);
+  }
+
+  // 3. open-to-work.jpg -> open-to-work.webp
+  const otwJpg = path.join(imagesDir, 'open-to-work.jpg');
+  const otwWebp = path.join(imagesDir, 'open-to-work.webp');
+  if (fs.existsSync(otwJpg) && (!fs.existsSync(otwWebp) || fs.statSync(otwJpg).mtimeMs > fs.statSync(otwWebp).mtimeMs)) {
+    console.log('   Converting open-to-work.jpg to WebP...');
+    await sharp(otwJpg)
+      .webp({ quality: 85 })
+      .toFile(otwWebp);
+    console.log('   ✅ open-to-work.webp generated');
+  }
+}
+
+async function uploadImages() {
+  const imagesDir = path.resolve('src/assets/images');
+  if (!fs.existsSync(imagesDir)) return;
+
+  const files = fs.readdirSync(imagesDir).filter((f) => {
+    const ext = path.extname(f).toLowerCase();
+    return ['.webp', '.jpg', '.jpeg', '.png', '.svg'].includes(ext) && !f.includes('original');
+  });
+
+  console.log(`\n📁 Found ${files.length} image files to sync in src/assets/images/`);
+
+  for (const file of files) {
+    const filePath = path.join(imagesDir, file);
+    const stats = fs.statSync(filePath);
+    const fileSizeKB = (stats.size / 1024).toFixed(1);
+    const key = `${imagesDestDir}/${file}`;
+
+    let shouldUpload = true;
+    try {
+      const head = await s3.send(
+        new HeadObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+        })
+      );
+      if (head.ContentLength === stats.size) {
+        console.log(`⏭️  Skipping image ${file} (${fileSizeKB} KB) — already up to date on Spaces`);
+        shouldUpload = false;
+      }
+    } catch {
+      shouldUpload = true;
+    }
+
+    if (shouldUpload) {
+      console.log(`⬆️  Uploading image ${file} (${fileSizeKB} KB)...`);
+      const fileBuffer = fs.readFileSync(filePath);
+      const ext = path.extname(file).toLowerCase();
+      let contentType = 'application/octet-stream';
+      if (ext === '.webp') contentType = 'image/webp';
+      else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+      else if (ext === '.png') contentType = 'image/png';
+      else if (ext === '.svg') contentType = 'image/svg+xml';
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+          Body: fileBuffer,
+          ACL: 'public-read',
+          ContentType: contentType,
+          CacheControl: 'public, max-age=31536000, immutable',
+        })
+      );
+      console.log(`   ✅ Uploaded: ${key} (Cache: 1 year, ACL: public-read)`);
+    }
+  }
+}
+
 async function uploadVideos() {
   const localDir = path.resolve('src/assets/videos');
   if (!fs.existsSync(localDir)) {
@@ -100,13 +210,13 @@ async function uploadVideos() {
   }
 
   const files = fs.readdirSync(localDir).filter((f) => f.endsWith('.mp4'));
-  console.log(`📁 Found ${files.length} video files to process in src/assets/videos/\n`);
+  console.log(`\n📁 Found ${files.length} video files to process in src/assets/videos/`);
 
   for (const file of files) {
     const filePath = path.join(localDir, file);
     const stats = fs.statSync(filePath);
     const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
-    const key = `${cleanDestDir}/${file}`;
+    const key = `${videosDestDir}/${file}`;
 
     // Check if file already exists with same size
     let shouldUpload = true;
@@ -118,16 +228,15 @@ async function uploadVideos() {
         })
       );
       if (head.ContentLength === stats.size) {
-        console.log(`⏭️  Skipping ${file} (${fileSizeMB} MB) — already up to date on Spaces`);
+        console.log(`⏭️  Skipping video ${file} (${fileSizeMB} MB) — already up to date on Spaces`);
         shouldUpload = false;
       }
-    } catch (e) {
-      // Object doesn't exist, proceed with upload
+    } catch {
       shouldUpload = true;
     }
 
     if (shouldUpload) {
-      console.log(`⬆️  Uploading ${file} (${fileSizeMB} MB)...`);
+      console.log(`⬆️  Uploading video ${file} (${fileSizeMB} MB)...`);
       const fileBuffer = fs.readFileSync(filePath);
 
       await s3.send(
@@ -143,16 +252,18 @@ async function uploadVideos() {
       console.log(`   ✅ Uploaded: ${key} (Cache: 1 year, ACL: public-read)`);
     }
   }
-
-  console.log('\n----------------------------------------------------');
-  console.log('🎉 All videos synced to DigitalOcean Spaces!');
-  console.log('📡 Public CDN base:');
-  console.log(`   ${cdnBase}`);
 }
 
 async function main() {
   await configureCors();
+  await optimizeImages();
+  await uploadImages();
   await uploadVideos();
+
+  console.log('\n----------------------------------------------------');
+  console.log('🎉 All media (images & videos) synced to DigitalOcean Spaces!');
+  console.log('📡 Public CDN base:');
+  console.log(`   ${cdnBase}`);
 }
 
 main().catch((err) => {

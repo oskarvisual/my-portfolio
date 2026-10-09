@@ -1,8 +1,12 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import cartImage from '../assets/images/cart.png';
-import floorImage from '../assets/images/floor.jpg';
+import cartWebp from '../assets/images/cart.webp';
+import floorWebp from '../assets/images/floor.webp';
+import { getCdnImageUrl } from '../utils/cdn';
+
+const resolvedCartImage = getCdnImageUrl(cartWebp, 'cart.webp');
+const resolvedFloorImage = getCdnImageUrl(floorWebp, 'floor.webp');
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -353,7 +357,7 @@ export const CartStory: React.FC = () => {
             ref={floorRef}
             className="absolute inset-x-0 -top-[1800px] -bottom-[1800px] floor-mask pointer-events-none will-change-transform"
             style={{
-              backgroundImage: `url(${floorImage})`,
+              backgroundImage: `url(${resolvedFloorImage})`,
               backgroundRepeat: 'repeat',
               backgroundSize: '720px 720px',
               filter: 'contrast(0.96) brightness(1.02)',
@@ -379,7 +383,12 @@ export const CartStory: React.FC = () => {
           >
             {/* Cart Top-down Image */}
             <img
-              src={cartImage}
+              src={resolvedCartImage}
+              onError={(e) => {
+                if (e.currentTarget.src !== cartWebp) {
+                  e.currentTarget.src = cartWebp;
+                }
+              }}
               alt="Shopping cart filled with modern technology plush mascots"
               className="w-full h-auto object-contain block select-none pointer-events-none"
               loading="eager"

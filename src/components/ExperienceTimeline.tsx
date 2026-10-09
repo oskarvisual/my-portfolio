@@ -2,7 +2,10 @@ import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import cvPdf from '../assets/docs/cv.pdf';
-import openToWorkImg from '../assets/images/open-to-work.jpg';
+import openToWorkWebp from '../assets/images/open-to-work.webp';
+import { getCdnImageUrl } from '../utils/cdn';
+
+const resolvedOpenToWorkImg = getCdnImageUrl(openToWorkWebp, 'open-to-work.webp');
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -347,7 +350,12 @@ export const ExperienceTimeline: React.FC = () => {
                     {/* Oscar's Open-to-work circular avatar */}
                     <div className="shrink-0">
                       <img
-                        src={openToWorkImg}
+                        src={resolvedOpenToWorkImg}
+                        onError={(e) => {
+                          if (e.currentTarget.src !== openToWorkWebp) {
+                            e.currentTarget.src = openToWorkWebp;
+                          }
+                        }}
                         alt="Oscar Fernandez - Open to Work"
                         className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 max-w-[150px] max-h-[150px] rounded-full object-cover border-2 border-paper shadow-md"
                       />
