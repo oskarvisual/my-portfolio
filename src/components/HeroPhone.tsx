@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
 import myPresentationVideo from '../assets/videos/my-presentation.mp4';
 import cvPdf from '../assets/docs/cv.pdf';
-import { getCdnVideoUrl } from '../utils/cdn';
+import { getCdnVideoUrl, getCdnImageUrl } from '../utils/cdn';
 
 const defaultPresentationVideo = getCdnVideoUrl(myPresentationVideo, 'my-presentation.mp4');
+const resolvedIphoneFrame = getCdnImageUrl(iphoneFrame, 'iphone-17.svg');
 
 interface HeroPhoneProps {
   /** Optional video source; defaults to my-presentation.mp4 or Spaces CDN */
@@ -423,7 +424,12 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
       {/* 2. IPHONE 17 VECTOR FRAME OVERLAY (Screen cut out transparently)    */}
       {/* =================================================================== */}
       <img
-        src={iphoneFrame}
+        src={resolvedIphoneFrame}
+        onError={(e) => {
+          if (e.currentTarget.src !== iphoneFrame) {
+            e.currentTarget.src = iphoneFrame;
+          }
+        }}
         alt="iPhone 17 Chassis Frame"
         className="absolute inset-0 w-full h-full object-contain pointer-events-none z-30 select-none drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
         loading="eager"

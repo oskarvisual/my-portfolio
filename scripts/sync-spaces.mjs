@@ -43,6 +43,7 @@ const cleanDestDir = DO_SPACES_DEST_DIR.replace(/^\/+|\/+$/g, '');
 const projectRoot = cleanDestDir.replace(/\/?(videos|images).*$/, '') || 'my-portfolio';
 const videosDestDir = `${projectRoot}/videos`;
 const imagesDestDir = `${projectRoot}/images`;
+const docsDestDir = `${projectRoot}/docs`;
 
 const endpoint = `https://${DO_SPACES_REGION}.digitaloceanspaces.com`;
 const cdnBase = `https://${DO_SPACES_BUCKET}.${DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${projectRoot}`;
@@ -254,14 +255,63 @@ async function uploadVideos() {
   }
 }
 
+async function uploadDocs() {
+  const docsDir = path.resolve('src/assets/docs');
+  if (!fs.existsSync(docsDir)) return;
+
+  const files = fs.readdirSync(docsDir).filter((f) => f.endsWith('.pdf'));
+  console.log(`\n📁 Found ${files.length} document files to sync in src/assets/docs/`);
+
+  for (const file of files) {
+    const filePath = path.join(docsDir, file);
+    const stats = fs.statSync(filePath);
+    const fileSizeKB = (stats.size / 1024).toFixed(1);
+    const key = `${docsDestDir}/${file}`;
+
+    let shouldUpload = true;
+    try {
+      const head = await s3.send(
+        new HeadObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+        })
+      );
+      if (head.ContentLength === stats.size) {
+        console.log(`⏭️  Skipping doc ${file} (${fileSizeKB} KB) — already up to date on Spaces`);
+        shouldUpload = false;
+      }
+    } catch {
+      shouldUpload = true;
+    }
+
+    if (shouldUpload) {
+      console.log(`⬆️  Uploading doc ${file} (${fileSizeKB} KB)...`);
+      const fileBuffer = fs.readFileSync(filePath);
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+          Body: fileBuffer,
+          ACL: 'public-read',
+          ContentType: 'application/pdf',
+          CacheControl: 'public, max-age=31536000, immutable',
+        })
+      );
+      console.log(`   ✅ Uploaded: ${key} (Cache: 1 year, ACL: public-read)`);
+    }
+  }
+}
+
 async function main() {
   await configureCors();
   await optimizeImages();
   await uploadImages();
   await uploadVideos();
+  await uploadDocs();
 
   console.log('\n----------------------------------------------------');
-  console.log('🎉 All media (images & videos) synced to DigitalOcean Spaces!');
+  console.log('🎉 All media (images, svgs, docs & videos) synced to DigitalOcean Spaces!');
   console.log('📡 Public CDN base:');
   console.log(`   ${cdnBase}`);
 }

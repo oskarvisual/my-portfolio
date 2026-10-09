@@ -24,3 +24,9 @@ export function getCdnImageUrl(localFallback: string, filename: string): string 
   if (!root) return localFallback;
   return `${root}/my-portfolio/images/${filename}`;
 }
+
+export function getCdnDocUrl(localFallback: string, filename: string): string {
+  const root = getRootCdn();
+  if (!root) return localFallback;
+  return `${root}/my-portfolio/docs/${filename}`;
+}
