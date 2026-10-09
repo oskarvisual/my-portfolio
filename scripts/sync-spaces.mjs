@@ -50,6 +50,15 @@ console.log('  • Endpoint:    ', endpoint);
 console.log('  • CDN URL:     ', cdnBase);
 console.log('----------------------------------------------------');
 
+if (process.env.GITHUB_ENV) {
+  try {
+    fs.appendFileSync(process.env.GITHUB_ENV, `VITE_SPACES_CDN_BASE_URL=${cdnBase}\n`);
+    console.log(`📡 Exported VITE_SPACES_CDN_BASE_URL to GITHUB_ENV: ${cdnBase}`);
+  } catch (e) {
+    console.warn('⚠️ Could not append to GITHUB_ENV:', e.message);
+  }
+}
+
 const s3 = new S3Client({
   endpoint,
   region: DO_SPACES_REGION,

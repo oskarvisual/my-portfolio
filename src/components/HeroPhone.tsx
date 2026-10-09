@@ -2,9 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
 import myPresentationVideo from '../assets/videos/my-presentation.mp4';
 import cvPdf from '../assets/docs/cv.pdf';
+import { getCdnVideoUrl } from '../utils/cdn';
+
+const defaultPresentationVideo = getCdnVideoUrl(myPresentationVideo, 'my-presentation.mp4');
 
 interface HeroPhoneProps {
-  /** Optional video source; defaults to my-presentation.mp4 */
+  /** Optional video source; defaults to my-presentation.mp4 or Spaces CDN */
   videoSrc?: string;
   className?: string;
 }
@@ -21,7 +24,7 @@ const getSystemTime = () => {
 };
 
 export const HeroPhone: React.FC<HeroPhoneProps> = ({
-  videoSrc = myPresentationVideo,
+  videoSrc = defaultPresentationVideo,
   className = '',
 }) => {
   // Live system time displayed on iPhone top status bar
@@ -203,6 +206,11 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
           playsInline
           preload="auto"
           onEnded={handleVideoEnded}
+          onError={(e) => {
+            if (e.currentTarget.src !== `${myPresentationVideo}#t=0.001`) {
+              e.currentTarget.src = `${myPresentationVideo}#t=0.001`;
+            }
+          }}
           className={`absolute inset-0 w-full h-full object-cover block bg-black z-0 transition-opacity duration-300 pointer-events-none ${
             playbackState === 'ended' ? 'opacity-0' : 'opacity-100'
           }`}

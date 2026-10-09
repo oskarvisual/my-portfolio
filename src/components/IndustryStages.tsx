@@ -8,6 +8,7 @@ import saasVideo from '../assets/videos/industry_saas.mp4';
 import nonprofitVideo from '../assets/videos/industry_non-profit.mp4';
 import recruitersVideo from '../assets/videos/industry_recruiters.mp4';
 import agencyVideo from '../assets/videos/industry_agancy.mp4';
+import { getCdnVideoUrl } from '../utils/cdn';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -43,7 +44,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered a complete custom WooCommerce platform with 14 bespoke plugins, sub-50ms Algolia faceted search, proportional ShipStation discount allocation, and real-time ERP catalog feeds.',
     domainTags: ['High-Risk Gateways', 'MAP Enforcement', 'Gun.deals XML', 'AvantLink Feeds', 'Algolia Search', 'WooCommerce HPOS'],
-    videoSrc: firearmsVideo,
+    videoSrc: getCdnVideoUrl(firearmsVideo, 'industry_firearms.mp4'),
   },
   {
     id: 'warehouse-logistics',
@@ -60,7 +61,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Architected a ruggedized mobile workstation on Retool Mobile and Zebra DataWedge with a Python FastAPI backend. Features cart concurrency locks, multi-bin split putaway, and 3-phase idempotent sync with Finale Inventory.',
     domainTags: ['Zebra DataWedge', 'Python (FastAPI)', 'Retool Mobile', 'Finale Inventory API', 'Idempotent Sync', 'Split Putaway'],
-    videoSrc: warehouseVideo,
+    videoSrc: getCdnVideoUrl(warehouseVideo, 'industry_warehouse.mp4'),
   },
   {
     id: 'saas-ai-fintech',
@@ -77,7 +78,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered bAInners AI Banner Studio and AI Product Q&A for Shopify with n8n workflow triggers and GraphQL APIs. Developed BrAIker: an autonomous multi-user trading bot fleet control room on Alpaca Paper with deterministic drawdown limits.',
     domainTags: ['Shopify App Bridge', 'OpenAI API', 'n8n Workflows', 'Alpaca Paper API', 'Prisma / MySQL', 'Redis Queues'],
-    videoSrc: saasVideo,
+    videoSrc: getCdnVideoUrl(saasVideo, 'industry_saas.mp4'),
   },
   {
     id: 'nonprofit-wilderness',
@@ -94,7 +95,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Delivered an enterprise-grade digital platform with a custom UX/UI design system and 20+ native Gutenberg blocks (React + PHP SSR) providing 1:1 editor-to-frontend parity, frictionless donation funnels, and monorepo architecture.',
     domainTags: ['Bespoke UX/UI Design', 'Native Gutenberg Blocks', '1:1 Visual Parity', 'Donation Funnels', 'WCAG Accessibility', 'Monorepo'],
-    videoSrc: nonprofitVideo,
+    videoSrc: getCdnVideoUrl(nonprofitVideo, 'industry_non-profit.mp4'),
   },
   {
     id: 'hrtech-recruitment',
@@ -111,7 +112,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered a complete enterprise Applicant Tracking System (ATS) from scratch, automated psychological test reporting with background PDF generators (90% manual workload cut), and built WCAG-compliant portals for Disiswork.',
     domainTags: ['Custom ATS Platform', 'PHP & AngularJS', 'PDF Automation', 'WCAG Compliance', 'Candidate Syndication', 'RESTful APIs'],
-    videoSrc: recruitersVideo,
+    videoSrc: getCdnVideoUrl(recruitersVideo, 'industry_recruiters.mp4'),
   },
   {
     id: 'dtc-agencies',
@@ -128,7 +129,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Led teams of 5 developers and collaborated directly with 5 UX/UI designers across US and LATAM client stores. Built custom email creative link converters (Klaviyo, FunnelKit), headless stores with sub-second TTFB, and strict QA testing protocols.',
     domainTags: ['Team Leadership', 'UX/UI Collaboration', 'Shopify Plus', 'Klaviyo / FunnelKit', 'Core Web Vitals', 'QA Protocols'],
-    videoSrc: agencyVideo,
+    videoSrc: getCdnVideoUrl(agencyVideo, 'industry_agancy.mp4'),
   },
 ];
 

@@ -6,6 +6,7 @@ import ecommerceVideo from '../assets/videos/ecommerce.mp4';
 import integrationsVideo from '../assets/videos/integrations.mp4';
 import optimizationVideo from '../assets/videos/optimization.mp4';
 import customappsVideo from '../assets/videos/customapps.mp4';
+import { getCdnVideoUrl } from '../utils/cdn';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -91,7 +92,7 @@ const SERVICES_DATA: ServiceData[] = [
     description:
       'Technical WooCommerce (Bedrock, HPOS, WP-CLI, Gutenberg, ACF Pro, custom hooks/filters and tailor-made plugins), Shopify Plus and BigCommerce. Architected for complex catalogs, tax rules, shipping workflows, product feeds and account portals.',
     tags: ['WooCommerce (HPOS)', 'Bedrock & WP-CLI', 'Shopify Plus', 'BigCommerce', 'Custom Plugins & Hooks', 'Gutenberg & ACF Pro', 'Catalog & Tax Operations'],
-    videoSrc: ecommerceVideo,
+    videoSrc: getCdnVideoUrl(ecommerceVideo, 'ecommerce.mp4'),
   },
   {
     id: 'integrations',
@@ -102,7 +103,7 @@ const SERVICES_DATA: ServiceData[] = [
     description:
       'Reliable backend pipelines engineered with webhooks, scheduled cron jobs, background queue processing, exponential retries, rate-limiting, and data synchronization across inventory, ERP, warehouse management and fulfillment.',
     tags: ['Webhooks & Cron Jobs', 'Background Retries & Queues', 'ShipStation & Finale', 'Salesforce CRM', 'n8n & Make', 'Warehouse & Fulfillment Sync'],
-    videoSrc: integrationsVideo,
+    videoSrc: getCdnVideoUrl(integrationsVideo, 'integrations.mp4'),
   },
   {
     id: 'performance',
@@ -113,7 +114,7 @@ const SERVICES_DATA: ServiceData[] = [
     description:
       'Production server administration across Linux environments (DigitalOcean, AWS), Nginx, Apache, PHP-FPM, and Redis object caching. Edge acceleration with Cloudflare, SQL query indexing, and deep Core Web Vitals optimization.',
     tags: ['Linux / DigitalOcean / AWS', 'Nginx, Apache & PHP-FPM', 'Cloudflare Edge', 'Redis Object Cache', 'SQL Query Indexing', 'Core Web Vitals'],
-    videoSrc: optimizationVideo,
+    videoSrc: getCdnVideoUrl(optimizationVideo, 'optimization.mp4'),
   },
   {
     id: 'custom-apps',
@@ -124,7 +125,7 @@ const SERVICES_DATA: ServiceData[] = [
     description:
       'Internal Retool dashboards, n8n & Make automated workflows, Python scripts, CLI utilities and custom plugins built with strict engineering discipline: QA regression testing, production validation, rapid troubleshooting, Git workflows, continuous integration and versioned releases.',
     tags: ['Retool Internal Apps', 'n8n & Make Automation', 'Python Scripts & CLIs', 'Custom WP Plugins', 'QA & Regression Testing', 'Versioned CI Deployments', 'AI Workflows (Codex, Claude)'],
-    videoSrc: customappsVideo,
+    videoSrc: getCdnVideoUrl(customappsVideo, 'customapps.mp4'),
   },
 ];
 
