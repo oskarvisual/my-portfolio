@@ -273,9 +273,9 @@ export const IndustryStages: React.FC = () => {
         className="relative lg:min-h-[100svh] w-full flex flex-col justify-between py-10 md:py-14 lg:py-16 px-6 md:px-12 lg:px-16 border-t border-ink/10 overflow-hidden"
       >
         {/* =================================================================== */}
-        {/* TOP HEADER & CONTROLS BAR                                           */}
+        {/* TOP HEADER                                                          */}
         {/* =================================================================== */}
-        <div className="max-w-7xl mx-auto w-full flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-10">
+        <div className="max-w-7xl mx-auto w-full mb-8 lg:mb-10">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-5 h-[1px] bg-accent" />
@@ -289,35 +289,6 @@ export const IndustryStages: React.FC = () => {
             <p className="font-editorial italic text-lg sm:text-xl md:text-2xl text-ink/75 max-w-xl font-light mt-2">
               15+ years solving high-stakes challenges across specialized business models and regulated environments.
             </p>
-          </div>
-
-          {/* Right Header Navigation Pill & Quick Arrows */}
-          <div className="flex items-center gap-3 self-start md:self-end">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warm-100 border border-ink/10 font-mono text-xs">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-ink font-semibold">
-                INDUSTRY 0{activeStageIndex + 1} / 0{INDUSTRY_VERTICALS.length}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => handleSelectStage(activeStageIndex - 1)}
-                disabled={activeStageIndex === 0}
-                aria-label="Previous industry"
-                className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors"
-              >
-                ←
-              </button>
-              <button
-                onClick={() => handleSelectStage(activeStageIndex + 1)}
-                disabled={activeStageIndex === INDUSTRY_VERTICALS.length - 1}
-                aria-label="Next industry"
-                className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors"
-              >
-                →
-              </button>
-            </div>
           </div>
         </div>
 
