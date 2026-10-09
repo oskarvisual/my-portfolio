@@ -135,6 +135,7 @@ const INDUSTRY_VERTICALS: IndustryVertical[] = [
 export const IndustryStages: React.FC = () => {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(false); // Default unmuted as requested ("con sonido")
+  const [isSectionInView, setIsSectionInView] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
@@ -152,6 +153,10 @@ export const IndustryStages: React.FC = () => {
         pin: pinSectionRef.current,
         start: 'top top',
         end: '+=3000',
+        onEnter: () => setIsSectionInView(true),
+        onLeave: () => setIsSectionInView(false),
+        onEnterBack: () => setIsSectionInView(true),
+        onLeaveBack: () => setIsSectionInView(false),
         onUpdate: (self) => {
           if (isProgrammaticScrollRef.current) return;
           const numStages = INDUSTRY_VERTICALS.length;
@@ -163,6 +168,10 @@ export const IndustryStages: React.FC = () => {
         },
       });
 
+      if (st.progress > 0 && st.progress < 1) {
+        setIsSectionInView(true);
+      }
+
       scrollTriggerRef.current = st;
 
       return () => {
@@ -173,16 +182,47 @@ export const IndustryStages: React.FC = () => {
     return () => mm.revert();
   }, []);
 
-  // Video playback management: play active video with sound, freeze on last frame, pause others
+  // Universal viewport observer: guarantees pause when leaving section on mobile or desktop
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            setIsSectionInView(false);
+          } else if (window.innerWidth < 1024) {
+            setIsSectionInView(true);
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Reset video to start when active stage changes
+  useEffect(() => {
+    const video = videoRefs.current[activeStageIndex];
+    if (video) {
+      try {
+        video.currentTime = 0;
+      } catch {}
+    }
+  }, [activeStageIndex]);
+
+  // Video playback management: play active video when in view, pause when scrolled away
   useEffect(() => {
     videoRefs.current.forEach((video, idx) => {
       if (!video) return;
 
-      if (idx === activeStageIndex) {
-        try {
-          video.currentTime = 0;
-          video.muted = isMuted;
+      video.muted = isMuted;
 
+      if (idx === activeStageIndex && isSectionInView) {
+        try {
           const playPromise = video.play();
           if (playPromise !== undefined) {
             playPromise.catch((err) => {
@@ -198,12 +238,9 @@ export const IndustryStages: React.FC = () => {
         } catch {}
       } else {
         video.pause();
-        try {
-          video.currentTime = 0;
-        } catch {}
       }
     });
-  }, [activeStageIndex, isMuted]);
+  }, [activeStageIndex, isMuted, isSectionInView]);
 
   // Audio mute/unmute toggle (applies globally to all videos)
   const toggleAudio = () => {
