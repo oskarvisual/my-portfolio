@@ -97,11 +97,11 @@ const SERVICES_DATA: ServiceData[] = [
     id: 'ecommerce',
     number: '01',
     category: 'Architecture & Storefronts',
-    title: 'Ecommerce Development',
+    title: 'Ecommerce Development & UX/UI',
     punchline: 'Storefronts built around the business — not around a template.',
     description:
-      'Technical WooCommerce (Bedrock, HPOS, WP-CLI, Gutenberg, ACF Pro, custom hooks/filters and tailor-made plugins), Shopify Plus and BigCommerce. Architected for complex catalogs, tax rules, shipping workflows, product feeds and account portals.',
-    tags: ['WooCommerce (HPOS)', 'Bedrock & WP-CLI', 'Shopify Plus', 'BigCommerce', 'Custom Plugins & Hooks', 'Gutenberg & ACF Pro', 'Catalog & Tax Operations'],
+      'Technical WooCommerce (Bedrock, HPOS, WP-CLI, Gutenberg, ACF Pro, custom plugins), Shopify Plus and BigCommerce. From Figma-to-code design systems and conversion-focused UX/UI (CRO checkout flows) to complex catalogs, tax rules, shipping workflows and account portals.',
+    tags: ['WooCommerce (HPOS)', 'Shopify Plus', 'Design Systems & CRO', 'Figma-to-Code 1:1', 'Custom Plugins & Hooks', 'Bedrock & WP-CLI', 'Catalog & Checkout Ops'],
     videoSrc: getCdnVideoUrl(ecommerceVideo, 'ecommerce.mp4'),
   },
   {
@@ -118,12 +118,12 @@ const SERVICES_DATA: ServiceData[] = [
   {
     id: 'performance',
     number: '03',
-    category: 'Infrastructure & Audits',
-    title: 'Infrastructure & Performance',
+    category: 'Infrastructure & Observability',
+    title: 'Infrastructure, Performance & Observability',
     punchline: 'Faster stores. Resilient servers. Zero unexpected downtime.',
     description:
-      'Production server administration across Linux environments (DigitalOcean, AWS), Nginx, Apache, PHP-FPM, and Redis object caching. Edge acceleration with Cloudflare, SQL query indexing, and deep Core Web Vitals optimization.',
-    tags: ['Linux / DigitalOcean / AWS', 'Nginx, Apache & PHP-FPM', 'Cloudflare Edge', 'Redis Object Cache', 'SQL Query Indexing', 'Core Web Vitals'],
+      'Production server administration across Linux environments (DigitalOcean, AWS), Nginx, PHP-FPM, and Redis object caching. Full-stack observability and APM with New Relic, Bugsnag/Sentry exception tracking, edge acceleration with Cloudflare, SQL query indexing, and deep Core Web Vitals optimization.',
+    tags: ['Linux / DigitalOcean / AWS', 'New Relic & Bugsnag APM', 'Nginx & Redis Cache', 'Cloudflare Edge', 'SQL Indexing & Audits', 'Core Web Vitals 100'],
     videoSrc: getCdnVideoUrl(optimizationVideo, 'optimization.mp4'),
   },
   {

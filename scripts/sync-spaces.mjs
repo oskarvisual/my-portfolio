@@ -44,6 +44,7 @@ const projectRoot = cleanDestDir.replace(/\/?(videos|images).*$/, '') || 'my-por
 const videosDestDir = `${projectRoot}/videos`;
 const imagesDestDir = `${projectRoot}/images`;
 const docsDestDir = `${projectRoot}/docs`;
+const assetsDestDir = `${projectRoot}/assets`;
 
 const endpoint = `https://${DO_SPACES_REGION}.digitaloceanspaces.com`;
 const cdnBase = `https://${DO_SPACES_BUCKET}.${DO_SPACES_REGION}.cdn.digitaloceanspaces.com/${projectRoot}`;
@@ -316,15 +317,77 @@ async function uploadDocs() {
   }
 }
 
+async function uploadBuiltAssets() {
+  const distAssetsDir = path.resolve('dist/assets');
+  if (!fs.existsSync(distAssetsDir)) {
+    console.log('\nℹ️  dist/assets not found (build has not run yet). Skipping JS/CSS asset upload.');
+    return;
+  }
+
+  const files = fs.readdirSync(distAssetsDir);
+  console.log(`\n📦 Found ${files.length} built assets (JS, CSS, fonts, chunks) in dist/assets/`);
+
+  for (const file of files) {
+    const filePath = path.join(distAssetsDir, file);
+    const stats = fs.statSync(filePath);
+    const fileSizeKB = (stats.size / 1024).toFixed(1);
+    const key = `${assetsDestDir}/${file}`;
+
+    let shouldUpload = true;
+    try {
+      const head = await s3.send(
+        new HeadObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+        })
+      );
+      if (head.ContentLength === stats.size) {
+        console.log(`⏭️  Skipping built asset ${file} (${fileSizeKB} KB) — already up to date on Spaces`);
+        shouldUpload = false;
+      }
+    } catch {
+      shouldUpload = true;
+    }
+
+    if (shouldUpload) {
+      console.log(`⬆️  Uploading built asset ${file} (${fileSizeKB} KB)...`);
+      const fileBuffer = fs.readFileSync(filePath);
+      const ext = path.extname(file).toLowerCase();
+      let contentType = 'application/octet-stream';
+      if (ext === '.js' || ext === '.mjs') contentType = 'application/javascript; charset=utf-8';
+      else if (ext === '.css') contentType = 'text/css; charset=utf-8';
+      else if (ext === '.svg') contentType = 'image/svg+xml';
+      else if (ext === '.webp') contentType = 'image/webp';
+      else if (ext === '.png') contentType = 'image/png';
+      else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
+      else if (ext === '.pdf') contentType = 'application/pdf';
+      else if (ext === '.map') contentType = 'application/json';
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: DO_SPACES_BUCKET,
+          Key: key,
+          Body: fileBuffer,
+          ACL: 'public-read',
+          ContentType: contentType,
+          CacheControl: 'public, max-age=31536000, immutable',
+        })
+      );
+      console.log(`   ✅ Uploaded: ${key} (Cache: 1 year, ACL: public-read)`);
+    }
+  }
+}
+
 async function main() {
   await configureCors();
   await optimizeImages();
   await uploadImages();
   await uploadVideos();
   await uploadDocs();
+  await uploadBuiltAssets();
 
   console.log('\n----------------------------------------------------');
-  console.log('🎉 All media (images, svgs, docs & videos) synced to DigitalOcean Spaces!');
+  console.log('🎉 All media & built assets synced to DigitalOcean Spaces!');
   console.log('📡 Public CDN base:');
   console.log(`   ${cdnBase}`);
 }

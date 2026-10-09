@@ -45,6 +45,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Sync Built JS & CSS to DigitalOcean Spaces CDN
+        env:
+          DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
+          DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
+          DO_SPACES_BUCKET: ${{ secrets.DO_SPACES_BUCKET }}
+          DO_SPACES_REGION: ${{ secrets.DO_SPACES_REGION || 'sfo3' }}
+          DO_SPACES_DEST_DIR: ${{ secrets.DO_SPACES_DEST_DIR || 'my-portfolio/videos' }}
+        run: node scripts/sync-spaces.mjs
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
