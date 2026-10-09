@@ -33,8 +33,9 @@ const {
 } = process.env;
 
 if (!DO_SPACES_KEY || !DO_SPACES_SECRET || !DO_SPACES_BUCKET) {
-  console.error('❌ Error: Missing DO_SPACES_KEY, DO_SPACES_SECRET, or DO_SPACES_BUCKET in .env');
-  process.exit(1);
+  console.warn('⚠️ Notice: DO_SPACES credentials not detected in environment.');
+  console.warn('⚠️ Skipping DigitalOcean Spaces sync and continuing with build...');
+  process.exit(0);
 }
 
 const cleanDestDir = DO_SPACES_DEST_DIR.replace(/^\/+|\/+$/g, '');

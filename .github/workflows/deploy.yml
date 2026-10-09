@@ -34,7 +34,6 @@ jobs:
         run: npm ci
 
       - name: Sync Videos to DigitalOcean Spaces
-        if: ${{ secrets.DO_SPACES_KEY != '' }}
         env:
           DO_SPACES_KEY: ${{ secrets.DO_SPACES_KEY }}
           DO_SPACES_SECRET: ${{ secrets.DO_SPACES_SECRET }}
