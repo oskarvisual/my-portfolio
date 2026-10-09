@@ -205,16 +205,18 @@ export const IndustryStages: React.FC = () => {
     });
   }, [activeStageIndex, isMuted]);
 
-  // Audio mute/unmute toggle
+  // Audio mute/unmute toggle (applies globally to all videos)
   const toggleAudio = () => {
     setIsMuted((prev) => {
       const next = !prev;
-      const activeVideo = videoRefs.current[activeStageIndex];
-      if (activeVideo) {
-        activeVideo.muted = next;
-        if (!next) {
-          activeVideo.play().catch(() => {});
+      videoRefs.current.forEach((v) => {
+        if (v) {
+          v.muted = next;
         }
+      });
+      const activeVideo = videoRefs.current[activeStageIndex];
+      if (activeVideo && !next) {
+        activeVideo.play().catch(() => {});
       }
       return next;
     });
@@ -289,17 +291,8 @@ export const IndustryStages: React.FC = () => {
             </p>
           </div>
 
-          {/* Right Header Navigation Pill, Audio Toggle & Quick Arrows */}
-          <div className="flex items-center flex-wrap gap-2.5 self-start md:self-end">
-            <button
-              onClick={toggleAudio}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warm-100 hover:bg-warm-200 border border-ink/10 font-mono text-xs text-ink transition-colors cursor-pointer"
-              title={isMuted ? 'Turn Sound On' : 'Mute Sound'}
-            >
-              <span>{isMuted ? '🔇' : '🔊'}</span>
-              <span className="font-semibold">{isMuted ? 'MUTED' : 'SOUND ON'}</span>
-            </button>
-
+          {/* Right Header Navigation Pill & Quick Arrows */}
+          <div className="flex items-center gap-3 self-start md:self-end">
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warm-100 border border-ink/10 font-mono text-xs">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-ink font-semibold">
@@ -370,6 +363,52 @@ export const IndustryStages: React.FC = () => {
                   </div>
                 );
               })}
+
+              {/* Floating White Mute / Unmute Button in Bottom Right Corner */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleAudio();
+                }}
+                aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+                title={isMuted ? 'Unmute audio' : 'Mute audio'}
+                className="absolute bottom-4 right-4 z-20 w-10 h-10 rounded-full bg-white text-ink shadow-md hover:shadow-lg border border-ink/10 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+              >
+                {isMuted ? (
+                  /* Muted Icon (Speaker with slash) */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4 text-ink/70"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                ) : (
+                  /* Unmuted Icon (Speaker with waves) */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-4 h-4 text-accent"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
 
