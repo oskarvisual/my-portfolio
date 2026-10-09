@@ -393,7 +393,7 @@ export const CartStory: React.FC = () => {
               }}
               alt="Shopping cart filled with modern technology plush mascots"
               className="w-full h-auto object-contain block select-none pointer-events-none"
-              loading="eager"
+              loading="lazy"
             />
 
             {/* Mascot Slots Overlay */}

@@ -221,7 +221,7 @@ export const Projects: React.FC = () => {
                         <span
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border ml-1 ${
                             proj.urlLabel.toLowerCase().includes('construction')
-                              ? 'bg-amber-500/10 text-amber-700 border-amber-500/30'
+                              ? 'bg-amber-500/15 text-amber-950 font-semibold border-amber-500/40'
                               : 'bg-ink/5 text-ink-muted border-ink/10'
                           }`}
                         >

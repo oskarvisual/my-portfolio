@@ -17,8 +17,28 @@ interface VideoStageProps {
   shouldPreload?: boolean;
 }
 
-const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title, shouldPreload = true }) => {
+const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title, shouldPreload = false }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  // Viewport intersection observer: detects when the video player is actually on-screen
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsInView(entry.isIntersecting);
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -43,7 +63,7 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title, shouldPre
       }
     };
 
-    if (isActive) {
+    if (isActive && isInView) {
       if (video.readyState >= 2) {
         startPlayback();
       } else {
@@ -57,21 +77,21 @@ const VideoStage: React.FC<VideoStageProps> = ({ src, isActive, title, shouldPre
       }
     } else {
       video.pause();
-      try {
-        video.currentTime = 0;
-      } catch {}
     }
-  }, [isActive, src]);
+  }, [isActive, isInView, src]);
 
   return (
-    <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#f5f3ee] border border-ink/10 shadow-sm flex items-center justify-center">
+    <div
+      ref={containerRef}
+      className="relative w-full aspect-video rounded-2xl overflow-hidden bg-[#f5f3ee] border border-ink/10 shadow-sm flex items-center justify-center"
+    >
       <video
         ref={videoRef}
         src={src}
         muted
         playsInline
         loop={false}
-        preload={isActive || shouldPreload ? 'auto' : 'none'}
+        preload={shouldPreload ? 'auto' : 'none'}
         className="w-full h-full object-contain block bg-[#f5f3ee]"
         aria-label={`Demonstration video for ${title}`}
       >
@@ -142,6 +162,16 @@ const SERVICES_DATA: ServiceData[] = [
 export const WhatIBuild: React.FC = () => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isSectionNear, setIsSectionNear] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
@@ -346,14 +376,16 @@ export const WhatIBuild: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Right: 16:9 Video Player */}
+                      {/* Right: 16:9 Video Player (Desktop only) */}
                       <div className="col-span-7">
-                        <VideoStage
-                          src={service.videoSrc}
-                          isActive={isExpanded}
-                          title={service.title}
-                          shouldPreload={isSectionNear}
-                        />
+                        {isDesktop && (
+                          <VideoStage
+                            src={service.videoSrc}
+                            isActive={isExpanded}
+                            title={service.title}
+                            shouldPreload={isSectionNear}
+                          />
+                        )}
                       </div>
                     </div>
 
@@ -418,12 +450,14 @@ export const WhatIBuild: React.FC = () => {
                       ))}
                     </div>
                     <div className="pt-2">
-                      <VideoStage
-                        src={service.videoSrc}
-                        isActive={isExpanded}
-                        title={service.title}
-                        shouldPreload={isSectionNear}
-                      />
+                      {!isDesktop && (
+                        <VideoStage
+                          src={service.videoSrc}
+                          isActive={isExpanded}
+                          title={service.title}
+                          shouldPreload={isSectionNear}
+                        />
+                      )}
                     </div>
                   </div>
                 )}
@@ -436,7 +470,7 @@ export const WhatIBuild: React.FC = () => {
         {isSectionNear && (
           <div className="hidden" aria-hidden="true">
             {SERVICES_DATA.filter((_, i) => i !== activeIdx).map((s) => (
-              <video key={`preload-${s.id}`} src={s.videoSrc} preload="auto" muted playsInline />
+              <video key={`preload-${s.id}`} src={s.videoSrc} preload="metadata" muted playsInline />
             ))}
           </div>
         )}

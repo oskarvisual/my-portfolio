@@ -435,7 +435,7 @@ export const IndustryStages: React.FC = () => {
                       webkit-playsinline="true"
                       muted={isMuted}
                       loop={false}
-                      preload={idx === activeStageIndex || isNearSection ? 'auto' : 'none'}
+                      preload={isNearSection ? (idx === activeStageIndex ? 'auto' : 'metadata') : 'none'}
                       onEnded={() => {
                         // Freezes gracefully on the last frame as requested
                         const v = videoRefs.current[idx];

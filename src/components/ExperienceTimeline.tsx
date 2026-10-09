@@ -239,7 +239,7 @@ export const ExperienceTimeline: React.FC = () => {
                   <span className="font-sans text-2xl sm:text-3xl font-bold text-ink block leading-none tracking-tight">
                     {role.yearDisplay}
                   </span>
-                  <span className="font-mono text-[11px] sm:text-xs text-ink/50 mt-2 block whitespace-nowrap">
+                  <span className="font-mono text-[11px] sm:text-xs text-ink/80 font-medium mt-2 block whitespace-nowrap">
                     {role.dateRange}
                   </span>
                 </div>
@@ -259,7 +259,7 @@ export const ExperienceTimeline: React.FC = () => {
                     <span className="font-sans text-2xl font-bold text-ink">
                       {role.yearDisplay}
                     </span>
-                    <span className="font-mono text-xs text-ink/50 whitespace-nowrap">
+                    <span className="font-mono text-xs text-ink/80 font-medium whitespace-nowrap">
                       {role.dateRange}
                     </span>
                   </div>

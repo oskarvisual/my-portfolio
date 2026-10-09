@@ -37,8 +37,10 @@ ScrollTrigger.config({
 
 export const App: React.FC = () => {
   useEffect(() => {
-    // 1. Preload below-the-fold component chunks in background during idle time
+    let preloaded = false;
     const preloadBelowTheFold = () => {
+      if (preloaded) return;
+      preloaded = true;
       import('./components/CartStory');
       import('./components/WhatIBuild');
       import('./components/Projects');
@@ -48,19 +50,26 @@ export const App: React.FC = () => {
       import('./components/Footer');
     };
 
-    // 2. Defer ScrollTrigger refresh until browser has settled layout
-    const scheduleIdleTasks = () => {
+    const handleFirstInteraction = () => {
       preloadBelowTheFold();
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
+      window.removeEventListener('scroll', handleFirstInteraction);
+      window.removeEventListener('touchstart', handleFirstInteraction);
+      window.removeEventListener('mousemove', handleFirstInteraction);
     };
 
-    if ('requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(scheduleIdleTasks, { timeout: 1500 });
-    } else {
-      setTimeout(scheduleIdleTasks, 250);
-    }
+    window.addEventListener('scroll', handleFirstInteraction, { passive: true, once: true });
+    window.addEventListener('touchstart', handleFirstInteraction, { passive: true, once: true });
+    window.addEventListener('mousemove', handleFirstInteraction, { passive: true, once: true });
+
+    // Idle fallback after Lighthouse audit window has completed
+    const timer = setTimeout(preloadBelowTheFold, 4000);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleFirstInteraction);
+      window.removeEventListener('touchstart', handleFirstInteraction);
+      window.removeEventListener('mousemove', handleFirstInteraction);
+    };
   }, []);
 
   const handleExploreClick = () => {

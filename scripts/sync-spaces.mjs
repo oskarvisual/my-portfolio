@@ -124,10 +124,15 @@ async function optimizeImages() {
   // 2. cart.png (Shopping cart with alpha) -> cart.webp
   const cartPng = path.join(imagesDir, 'cart.png');
   const cartWebp = path.join(imagesDir, 'cart.webp');
-  if (fs.existsSync(cartPng) && (!fs.existsSync(cartWebp) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartWebp).mtimeMs)) {
-    console.log('   Converting cart.png to transparent WebP (q85, effort 6)...');
+  const shouldRegenCart = !fs.existsSync(cartWebp) || 
+    fs.statSync(cartWebp).size > 180000 || 
+    (fs.existsSync(cartPng) && fs.statSync(cartPng).mtimeMs > fs.statSync(cartWebp).mtimeMs);
+
+  if (fs.existsSync(cartPng) && shouldRegenCart) {
+    console.log('   Converting cart.png to optimized transparent WebP (max-w 650px, q78, effort 6)...');
     await sharp(cartPng)
-      .webp({ quality: 85, effort: 6 })
+      .resize(650, null, { fit: 'inside' })
+      .webp({ quality: 78, effort: 6 })
       .toFile(cartWebp);
     const oldSz = (fs.statSync(cartPng).size / 1024).toFixed(1);
     const newSz = (fs.statSync(cartWebp).size / 1024).toFixed(1);
