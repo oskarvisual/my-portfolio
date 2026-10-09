@@ -198,33 +198,33 @@ export const IndustryStages: React.FC = () => {
           </p>
         </div>
 
-        {/* Split Grid: Sticky Minimal Stage (Left) & Scrolling Domain Stories (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        {/* Split Grid: Sticky Vertical Minimal Stage (Left) & Scrolling Domain Stories (Right) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           {/* ================================================================= */}
-          {/* LEFT COLUMN: STICKY "POCOYÓ" MINIMAL STAGE                        */}
+          {/* LEFT COLUMN: STICKY VERTICAL 9:16 "POCOYÓ" MINIMAL STAGE          */}
           {/* ================================================================= */}
-          <div className="hidden lg:block lg:col-span-5 sticky top-28 z-20">
-            <div className="rounded-3xl border border-ink/15 bg-paper p-6 sm:p-8 flex flex-col justify-between shadow-xs overflow-hidden relative min-h-[580px]">
+          <div className="hidden lg:block lg:col-span-4 sticky top-24 z-20">
+            <div className="rounded-3xl border border-ink/15 bg-paper p-5 sm:p-6 flex flex-col justify-between shadow-xs overflow-hidden relative min-h-[580px]">
               {/* Minimal Stage Background (Seamless #F8F7F4 with subtle ambient lighting) */}
               <div className="absolute inset-0 bg-paper pointer-events-none" />
 
               {/* Stage Top Header: Active Stage Status */}
-              <div className="relative z-10 flex items-center justify-between border-b border-ink/10 pb-4">
+              <div className="relative z-10 flex items-center justify-between border-b border-ink/10 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
                     STAGE {activeVertical.number}
                   </span>
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-                  CHARACTER ROLEPLAY
+                <span className="font-mono text-[9px] uppercase tracking-wider text-ink-muted">
+                  9:16 VERTICAL STAGE
                 </span>
               </div>
 
-              {/* STAGE DISPLAY AREA (Seamless blending with bg-paper #F8F7F4) */}
-              <div className="relative z-10 my-auto py-8 flex flex-col items-center justify-center text-center">
-                {/* Video elements (rendered once for seamless crossfade and caching) */}
-                <div className="relative w-full aspect-[4/5] max-h-[380px] flex items-center justify-center rounded-2xl overflow-hidden bg-paper">
+              {/* STAGE DISPLAY AREA (Vertical 9:16 Aspect Ratio) */}
+              <div className="relative z-10 my-auto py-4 flex flex-col items-center justify-center text-center">
+                {/* 9:16 Vertical Video Frame (Max width 260px, Seamless #F8F7F4 blending) */}
+                <div className="relative w-full aspect-[9/16] max-h-[460px] max-w-[260px] flex items-center justify-center rounded-2xl overflow-hidden bg-paper shadow-2xs">
                   {INDUSTRY_VERTICALS.map((vertical, idx) => {
                     const isActive = idx === activeStageIndex;
 
@@ -321,7 +321,7 @@ export const IndustryStages: React.FC = () => {
           {/* ================================================================= */}
           {/* RIGHT COLUMN: SCROLLING DOMAIN STORIES                            */}
           {/* ================================================================= */}
-          <div className="lg:col-span-7 space-y-8 sm:space-y-10">
+          <div className="lg:col-span-8 space-y-8 sm:space-y-10">
             {INDUSTRY_VERTICALS.map((vertical, index) => {
               const isActive = index === activeStageIndex;
 
@@ -351,31 +351,16 @@ export const IndustryStages: React.FC = () => {
                       </span>
                     </div>
 
-                    {/* Metric Highlight Pill */}
-                    <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
-                      {vertical.highlightMetric}
-                    </div>
+                    {/* Metric Highlight Pill & Mobile Role Badge */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
+                        {vertical.highlightMetric}
+                      </div>
 
-                    {/* Mobile Character Stage Visual (Shown only on small screens) */}
-                    <div className="block lg:hidden my-2 p-4 rounded-2xl bg-paper border border-ink/10 text-center space-y-2">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-accent font-bold block">
-                        🎭 In-Character Roleplay
-                      </span>
-                      <p className="font-sans text-sm font-semibold text-ink">
-                        {vertical.characterTitle}
-                      </p>
-                      <p className="font-sans text-xs text-ink-muted">
-                        {vertical.characterCostume}
-                      </p>
-                      <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-                        {vertical.minimalProps.map((p) => (
-                          <span
-                            key={p}
-                            className="px-2 py-0.5 rounded bg-warm-100 text-[10px] font-mono text-ink-muted"
-                          >
-                            ✦ {p}
-                          </span>
-                        ))}
+                      {/* Lightweight Mobile-Only Character Badge */}
+                      <div className="inline-flex lg:hidden items-center gap-1.5 px-3 py-1 rounded-full bg-paper border border-ink/10 font-mono text-[11px] text-ink-muted">
+                        <span className="text-accent">🎭</span>
+                        <span className="font-semibold text-ink">{vertical.characterTitle}</span>
                       </div>
                     </div>
 
