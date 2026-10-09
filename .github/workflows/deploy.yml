@@ -41,7 +41,7 @@ jobs:
           DO_SPACES_BUCKET: ${{ secrets.DO_SPACES_BUCKET }}
           DO_SPACES_REGION: ${{ secrets.DO_SPACES_REGION || 'nyc3' }}
           DO_SPACES_DEST_DIR: ${{ secrets.DO_SPACES_DEST_DIR || 'my-portfolio/videos' }}
-        run: bash scripts/sync-videos.sh
+        run: node scripts/sync-spaces.mjs
 
       - name: Build
         run: npm run build
