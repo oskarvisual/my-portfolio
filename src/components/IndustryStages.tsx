@@ -329,87 +329,57 @@ export const IndustryStages: React.FC = () => {
         </div>
 
         {/* =================================================================== */}
-        {/* MAIN STAGE & ACTIVE INDUSTRY CARD (2 COLUMNS, 1 ACTIVE CARD AT A TIME) */}
+        {/* MAIN STAGE & ACTIVE INDUSTRY CARD (2 COLUMNS, EQUAL HEIGHT)          */}
         {/* =================================================================== */}
-        <div className="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-center my-auto py-2">
+        <div className="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-stretch my-auto py-2">
           {/* ----------------------------------------------------------------- */}
-          {/* LEFT: 9:16 VERTICAL "POCOYÓ" STAGE WITH VIDEO & FREEZE ON END     */}
+          {/* LEFT: PURE VIDEO FRAMED WITH PLOMO BORDER (Matches right card height) */}
           {/* ----------------------------------------------------------------- */}
-          <div className="lg:col-span-4 flex justify-center">
-            <div className="w-full max-w-[240px] sm:max-w-[260px] lg:max-w-[280px] rounded-3xl border border-ink/15 bg-paper p-4 sm:p-5 flex flex-col justify-between shadow-xs overflow-hidden relative">
-              {/* Seamless paper background */}
-              <div className="absolute inset-0 bg-paper pointer-events-none" />
+          <div className="lg:col-span-4 flex justify-center items-stretch">
+            <div
+              onClick={toggleAudio}
+              title="Click to toggle sound"
+              className="w-full max-w-[320px] aspect-[9/16] lg:aspect-auto h-full min-h-[460px] lg:min-h-0 rounded-3xl border border-ink/15 bg-paper shadow-xs overflow-hidden relative cursor-pointer"
+            >
+              {INDUSTRY_VERTICALS.map((vertical, idx) => {
+                const isActive = idx === activeStageIndex;
 
-              {/* Stage Top Bar */}
-              <div className="relative z-10 flex items-center justify-between border-b border-ink/10 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                  <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
-                    STAGE {activeVertical.number}
-                  </span>
-                </div>
-                <button
-                  onClick={toggleAudio}
-                  className="flex items-center gap-1 font-mono text-[10px] text-ink-muted hover:text-ink transition-colors cursor-pointer"
-                >
-                  <span>{isMuted ? '🔇 Muted' : '🔊 Sound On'}</span>
-                </button>
-              </div>
-
-              {/* 9:16 Vertical Video Area */}
-              <div className="relative z-10 my-auto py-3 flex flex-col items-center justify-center">
-                <div className="relative w-full aspect-[9/16] max-h-[440px] flex items-center justify-center rounded-2xl overflow-hidden bg-paper shadow-2xs border border-ink/10">
-                  {INDUSTRY_VERTICALS.map((vertical, idx) => {
-                    const isActive = idx === activeStageIndex;
-
-                    return (
-                      <div
-                        key={vertical.id}
-                        className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 bg-paper ${
-                          isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-                        }`}
-                      >
-                        <video
-                          ref={(el) => (videoRefs.current[idx] = el)}
-                          src={vertical.videoSrc}
-                          playsInline
-                          webkit-playsinline="true"
-                          muted={isMuted}
-                          loop={false}
-                          preload="auto"
-                          onEnded={() => {
-                            // Freezes gracefully on the last frame as requested
-                            const v = videoRefs.current[idx];
-                            if (v) v.pause();
-                          }}
-                          className="w-full h-full object-cover rounded-2xl bg-paper"
-                          aria-label={`${vertical.characterTitle} vertical video`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Stage Bottom Footer */}
-              <div className="relative z-10 pt-3 border-t border-ink/10 flex items-center justify-between text-ink-muted text-xs font-mono">
-                <span className="truncate max-w-[170px] text-ink font-semibold">
-                  {activeVertical.characterTitle}
-                </span>
-                <span className="text-[10px] uppercase text-accent font-medium">
-                  {activeVertical.proofClient.split('·')[0].trim()}
-                </span>
-              </div>
+                return (
+                  <div
+                    key={vertical.id}
+                    className={`absolute inset-0 w-full h-full transition-opacity duration-500 bg-paper ${
+                      isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                    }`}
+                  >
+                    <video
+                      ref={(el) => (videoRefs.current[idx] = el)}
+                      src={vertical.videoSrc}
+                      playsInline
+                      webkit-playsinline="true"
+                      muted={isMuted}
+                      loop={false}
+                      preload="auto"
+                      onEnded={() => {
+                        // Freezes gracefully on the last frame as requested
+                        const v = videoRefs.current[idx];
+                        if (v) v.pause();
+                      }}
+                      className="w-full h-full object-cover block bg-paper"
+                      aria-label={`${vertical.industry} vertical video`}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* ----------------------------------------------------------------- */}
           {/* RIGHT: SINGLE ACTIVE INDUSTRY CARD (Changes smoothly on scroll/click) */}
           {/* ----------------------------------------------------------------- */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 flex flex-col justify-stretch">
             <div
               key={activeVertical.id}
-              className="rounded-3xl border border-ink/15 bg-warm-50/90 shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between animate-fade-in transition-all duration-300"
+              className="rounded-3xl border border-ink/15 bg-warm-50/90 shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between h-full animate-fade-in transition-all duration-300"
             >
               <div className="space-y-6">
                 {/* Header Row: Number & Client Context */}
