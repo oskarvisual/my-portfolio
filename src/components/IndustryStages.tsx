@@ -2,6 +2,13 @@ import React, { useState, useLayoutEffect, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import firearmsVideo from '../assets/videos/industry_firearms.mp4';
+import warehouseVideo from '../assets/videos/industry_warehouse.mp4';
+import saasVideo from '../assets/videos/industry_saas.mp4';
+import nonprofitVideo from '../assets/videos/industry_non-profit.mp4';
+import recruitersVideo from '../assets/videos/industry_recruiters.mp4';
+import agencyVideo from '../assets/videos/industry_agancy.mp4';
+
 gsap.registerPlugin(ScrollTrigger);
 
 export interface IndustryVertical {
@@ -17,10 +24,10 @@ export interface IndustryVertical {
   hardProblem: string;
   deliverables: string;
   domainTags: string[];
-  videoSrc?: string; // Will hold the 10-20s vertical video file once recorded
+  videoSrc: string;
 }
 
-export const INDUSTRY_VERTICALS: IndustryVertical[] = [
+const INDUSTRY_VERTICALS: IndustryVertical[] = [
   {
     id: 'regulated-tactical',
     number: '01',
@@ -36,6 +43,7 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered a complete custom WooCommerce platform with 14 bespoke plugins, sub-50ms Algolia faceted search, proportional ShipStation discount allocation, and real-time ERP catalog feeds.',
     domainTags: ['High-Risk Gateways', 'MAP Enforcement', 'Gun.deals XML', 'AvantLink Feeds', 'Algolia Search', 'WooCommerce HPOS'],
+    videoSrc: firearmsVideo,
   },
   {
     id: 'warehouse-logistics',
@@ -52,6 +60,7 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Architected a ruggedized mobile workstation on Retool Mobile and Zebra DataWedge with a Python FastAPI backend. Features cart concurrency locks, multi-bin split putaway, and 3-phase idempotent sync with Finale Inventory.',
     domainTags: ['Zebra DataWedge', 'Python (FastAPI)', 'Retool Mobile', 'Finale Inventory API', 'Idempotent Sync', 'Split Putaway'],
+    videoSrc: warehouseVideo,
   },
   {
     id: 'saas-ai-fintech',
@@ -68,6 +77,7 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered bAInners AI Banner Studio and AI Product Q&A for Shopify with n8n workflow triggers and GraphQL APIs. Developed BrAIker: an autonomous multi-user trading bot fleet control room on Alpaca Paper with deterministic drawdown limits.',
     domainTags: ['Shopify App Bridge', 'OpenAI API', 'n8n Workflows', 'Alpaca Paper API', 'Prisma / MySQL', 'Redis Queues'],
+    videoSrc: saasVideo,
   },
   {
     id: 'nonprofit-wilderness',
@@ -84,6 +94,7 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Delivered an enterprise-grade digital platform with a custom UX/UI design system and 20+ native Gutenberg blocks (React + PHP SSR) providing 1:1 editor-to-frontend parity, frictionless donation funnels, and monorepo architecture.',
     domainTags: ['Bespoke UX/UI Design', 'Native Gutenberg Blocks', '1:1 Visual Parity', 'Donation Funnels', 'WCAG Accessibility', 'Monorepo'],
+    videoSrc: nonprofitVideo,
   },
   {
     id: 'hrtech-recruitment',
@@ -100,6 +111,7 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Engineered a complete enterprise Applicant Tracking System (ATS) from scratch, automated psychological test reporting with background PDF generators (90% manual workload cut), and built WCAG-compliant portals for Disiswork.',
     domainTags: ['Custom ATS Platform', 'PHP & AngularJS', 'PDF Automation', 'WCAG Compliance', 'Candidate Syndication', 'RESTful APIs'],
+    videoSrc: recruitersVideo,
   },
   {
     id: 'dtc-agencies',
@@ -116,11 +128,13 @@ export const INDUSTRY_VERTICALS: IndustryVertical[] = [
     deliverables:
       'Led teams of 5 developers and collaborated directly with 5 UX/UI designers across US and LATAM client stores. Built custom email creative link converters (Klaviyo, FunnelKit), headless stores with sub-second TTFB, and strict QA testing protocols.',
     domainTags: ['Team Leadership', 'UX/UI Collaboration', 'Shopify Plus', 'Klaviyo / FunnelKit', 'Core Web Vitals', 'QA Protocols'],
+    videoSrc: agencyVideo,
   },
 ];
 
 export const IndustryStages: React.FC = () => {
   const [activeStageIndex, setActiveStageIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(false); // Default unmuted as requested ("con sonido")
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
@@ -159,7 +173,7 @@ export const IndustryStages: React.FC = () => {
     return () => mm.revert();
   }, []);
 
-  // Video playback management: play active video, freeze on last frame, pause others
+  // Video playback management: play active video with sound, freeze on last frame, pause others
   useEffect(() => {
     videoRefs.current.forEach((video, idx) => {
       if (!video) return;
@@ -167,9 +181,19 @@ export const IndustryStages: React.FC = () => {
       if (idx === activeStageIndex) {
         try {
           video.currentTime = 0;
-          const promise = video.play();
-          if (promise !== undefined) {
-            promise.catch(() => {});
+          video.muted = isMuted;
+
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+              // If browser autoplay policy blocks unmuted playback before user interaction,
+              // fallback gracefully to muted playback so the video doesn't stall
+              if (!video.muted) {
+                console.warn('Browser blocked unmuted autoplay policy, playing muted fallback:', err);
+                video.muted = true;
+                video.play().catch(() => {});
+              }
+            });
           }
         } catch {}
       } else {
@@ -179,7 +203,22 @@ export const IndustryStages: React.FC = () => {
         } catch {}
       }
     });
-  }, [activeStageIndex]);
+  }, [activeStageIndex, isMuted]);
+
+  // Audio mute/unmute toggle
+  const toggleAudio = () => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      const activeVideo = videoRefs.current[activeStageIndex];
+      if (activeVideo) {
+        activeVideo.muted = next;
+        if (!next) {
+          activeVideo.play().catch(() => {});
+        }
+      }
+      return next;
+    });
+  };
 
   // Programmatic jump to a specific industry stage (via arrows or pagination dots)
   const handleSelectStage = (idx: number) => {
@@ -250,8 +289,17 @@ export const IndustryStages: React.FC = () => {
             </p>
           </div>
 
-          {/* Right Header Navigation Pill & Quick Arrows */}
-          <div className="flex items-center gap-3 self-start md:self-end">
+          {/* Right Header Navigation Pill, Audio Toggle & Quick Arrows */}
+          <div className="flex items-center flex-wrap gap-2.5 self-start md:self-end">
+            <button
+              onClick={toggleAudio}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warm-100 hover:bg-warm-200 border border-ink/10 font-mono text-xs text-ink transition-colors cursor-pointer"
+              title={isMuted ? 'Turn Sound On' : 'Mute Sound'}
+            >
+              <span>{isMuted ? '🔇' : '🔊'}</span>
+              <span className="font-semibold">{isMuted ? 'MUTED' : 'SOUND ON'}</span>
+            </button>
+
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-warm-100 border border-ink/10 font-mono text-xs">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               <span className="text-ink font-semibold">
@@ -285,10 +333,10 @@ export const IndustryStages: React.FC = () => {
         {/* =================================================================== */}
         <div className="max-w-7xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12 items-center my-auto py-2">
           {/* ----------------------------------------------------------------- */}
-          {/* LEFT: 9:16 VERTICAL "POCOYÓ" MINIMAL STAGE                        */}
+          {/* LEFT: 9:16 VERTICAL "POCOYÓ" STAGE WITH VIDEO & FREEZE ON END     */}
           {/* ----------------------------------------------------------------- */}
           <div className="lg:col-span-4 flex justify-center">
-            <div className="w-full max-w-[280px] rounded-3xl border border-ink/15 bg-paper p-5 flex flex-col justify-between shadow-xs overflow-hidden relative">
+            <div className="w-full max-w-[240px] sm:max-w-[260px] lg:max-w-[280px] rounded-3xl border border-ink/15 bg-paper p-4 sm:p-5 flex flex-col justify-between shadow-xs overflow-hidden relative">
               {/* Seamless paper background */}
               <div className="absolute inset-0 bg-paper pointer-events-none" />
 
@@ -300,14 +348,17 @@ export const IndustryStages: React.FC = () => {
                     STAGE {activeVertical.number}
                   </span>
                 </div>
-                <span className="font-mono text-[9px] uppercase tracking-wider text-ink-muted">
-                  9:16 VERTICAL STAGE
-                </span>
+                <button
+                  onClick={toggleAudio}
+                  className="flex items-center gap-1 font-mono text-[10px] text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                >
+                  <span>{isMuted ? '🔇 Muted' : '🔊 Sound On'}</span>
+                </button>
               </div>
 
-              {/* 9:16 Frame Area */}
+              {/* 9:16 Vertical Video Area */}
               <div className="relative z-10 my-auto py-3 flex flex-col items-center justify-center">
-                <div className="relative w-full aspect-[9/16] max-h-[440px] flex items-center justify-center rounded-2xl overflow-hidden bg-paper shadow-2xs">
+                <div className="relative w-full aspect-[9/16] max-h-[440px] flex items-center justify-center rounded-2xl overflow-hidden bg-paper shadow-2xs border border-ink/10">
                   {INDUSTRY_VERTICALS.map((vertical, idx) => {
                     const isActive = idx === activeStageIndex;
 
@@ -318,71 +369,22 @@ export const IndustryStages: React.FC = () => {
                           isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
                         }`}
                       >
-                        {vertical.videoSrc ? (
-                          <video
-                            ref={(el) => (videoRefs.current[idx] = el)}
-                            src={vertical.videoSrc}
-                            playsInline
-                            muted
-                            loop={false}
-                            preload="auto"
-                            onEnded={() => {
-                              // Freezes gracefully on the last frame as requested
-                              const v = videoRefs.current[idx];
-                              if (v) v.pause();
-                            }}
-                            className="w-full h-full object-contain block bg-paper"
-                            aria-label={`${vertical.characterTitle} stage video`}
-                          />
-                        ) : (
-                          /* Pocoyó Minimal Stage Artwork & Character Preview */
-                          <div className="w-full h-full p-5 flex flex-col items-center justify-between bg-paper relative select-none">
-                            {/* Ambient stage floor pedestal shadow */}
-                            <div className="absolute bottom-5 w-3/4 h-8 rounded-full bg-ink/5 blur-md" />
-
-                            {/* Minimal Role Avatar Icon */}
-                            <div className="w-20 h-20 rounded-full bg-warm-100 border border-ink/10 flex items-center justify-center shadow-xs text-accent mt-2 relative">
-                              <span className="font-mono text-3xl font-light">
-                                {idx === 0 && '🎯'}
-                                {idx === 1 && '📦'}
-                                {idx === 2 && '⚡'}
-                                {idx === 3 && '🌲'}
-                                {idx === 4 && '📋'}
-                                {idx === 5 && '🚀'}
-                              </span>
-                              <span className="absolute -bottom-2 px-2 py-0.5 rounded-full bg-accent text-paper font-mono text-[8px] uppercase tracking-wider font-semibold">
-                                Oscar In Character
-                              </span>
-                            </div>
-
-                            {/* Role & Costume Details */}
-                            <div className="space-y-1.5 mt-3 max-w-xs text-center">
-                              <h4 className="font-sans font-bold text-base text-ink">
-                                {vertical.characterTitle}
-                              </h4>
-                              <p className="font-sans text-[11px] text-ink-muted leading-relaxed">
-                                {vertical.characterCostume}
-                              </p>
-                            </div>
-
-                            {/* Minimal Realistic Props List */}
-                            <div className="w-full pt-3 border-t border-ink/10 text-center">
-                              <span className="font-mono text-[9px] uppercase tracking-widest text-ink-muted block mb-1.5">
-                                Minimal Stage Props:
-                              </span>
-                              <div className="flex flex-wrap items-center justify-center gap-1">
-                                {vertical.minimalProps.map((prop) => (
-                                  <span
-                                    key={prop}
-                                    className="px-1.5 py-0.5 rounded bg-warm-100 text-ink/80 text-[9px] font-mono border border-ink/10"
-                                  >
-                                    ✦ {prop}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                        <video
+                          ref={(el) => (videoRefs.current[idx] = el)}
+                          src={vertical.videoSrc}
+                          playsInline
+                          webkit-playsinline="true"
+                          muted={isMuted}
+                          loop={false}
+                          preload="auto"
+                          onEnded={() => {
+                            // Freezes gracefully on the last frame as requested
+                            const v = videoRefs.current[idx];
+                            if (v) v.pause();
+                          }}
+                          className="w-full h-full object-cover rounded-2xl bg-paper"
+                          aria-label={`${vertical.characterTitle} vertical video`}
+                        />
                       </div>
                     );
                   })}
@@ -392,7 +394,7 @@ export const IndustryStages: React.FC = () => {
               {/* Stage Bottom Footer */}
               <div className="relative z-10 pt-3 border-t border-ink/10 flex items-center justify-between text-ink-muted text-xs font-mono">
                 <span className="truncate max-w-[170px] text-ink font-semibold">
-                  {activeVertical.industry}
+                  {activeVertical.characterTitle}
                 </span>
                 <span className="text-[10px] uppercase text-accent font-medium">
                   {activeVertical.proofClient.split('·')[0].trim()}
@@ -531,7 +533,6 @@ export const IndustryStages: React.FC = () => {
                 onClick={() => handleSelectStage(activeStageIndex + 1)}
                 disabled={activeStageIndex === INDUSTRY_VERTICALS.length - 1}
                 className="w-8 h-8 rounded-full border border-ink/15 flex items-center justify-center text-ink text-xs hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors"
-                aria-label="Next industry"
               >
                 →
               </button>
