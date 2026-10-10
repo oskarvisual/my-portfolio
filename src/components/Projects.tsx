@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 interface Project {
   number: string;
@@ -161,13 +161,167 @@ const PROJECTS: Project[] = [
   },
 ];
 
+const renderProjectCard = (proj: Project, isMobileSlide = false) => (
+  <div
+    key={proj.number}
+    className={`group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-7 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl ${
+      isMobileSlide ? 'animate-fade-in h-full' : ''
+    }`}
+  >
+    <div className="space-y-6">
+      {/* Header row */}
+      <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
+        <span className="font-mono text-2xl font-light text-accent">
+          {proj.number}
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+            {proj.clientType}
+          </span>
+          {proj.url ? (
+            <a
+              href={proj.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${proj.urlLabel || 'View Project'}: ${proj.title}`}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 hover:bg-accent hover:text-paper text-ink transition-all border border-ink/10 hover:border-accent ml-1 group/btn"
+            >
+              <span>{proj.urlLabel || 'View'}</span>
+              <span className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5">
+                ↗
+              </span>
+            </a>
+          ) : (
+            proj.urlLabel && (
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border ml-1 ${
+                  proj.urlLabel.toLowerCase().includes('construction')
+                    ? 'bg-amber-500/15 text-amber-950 font-semibold border-amber-500/40'
+                    : 'bg-ink/5 text-ink-muted border-ink/10'
+                }`}
+              >
+                {proj.urlLabel.toLowerCase().includes('construction') && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                )}
+                <span>{proj.urlLabel}</span>
+              </span>
+            )
+          )}
+        </div>
+      </div>
+
+      {/* Metric pill */}
+      <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
+        {proj.highlightMetric}
+      </div>
+
+      {/* Title & Description */}
+      <div>
+        {proj.url ? (
+          <a
+            href={proj.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/title inline-block"
+          >
+            <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover/title:text-accent transition-colors">
+              {proj.title}
+            </h3>
+          </a>
+        ) : (
+          <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
+            {proj.title}
+          </h3>
+        )}
+        <p className="font-sans text-ink-muted text-sm sm:text-base leading-relaxed mt-3">
+          {proj.description}
+        </p>
+      </div>
+
+      {/* Key Architecture Highlights */}
+      <div className="space-y-2 pt-2 border-t border-ink/10">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
+          Architecture &amp; Business Value:
+        </span>
+        <ul className="space-y-1.5 text-xs font-sans text-ink/90">
+          {proj.architecturePoints.map((point) => (
+            <li key={point} className="flex items-start gap-2">
+              <span className="text-accent mt-0.5 shrink-0">✦</span>
+              <span>{point}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    {/* Tech Stack Chips */}
+    <div className="pt-6 mt-6 border-t border-ink/10 flex flex-wrap gap-2">
+      {proj.stack.map((t) => (
+        <span
+          key={t}
+          className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
+        >
+          {t}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
 export const Projects: React.FC = () => {
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
+  const handleSelectProject = (idx: number) => {
+    const boundedIdx = Math.max(0, Math.min(PROJECTS.length - 1, idx));
+    setActiveProjectIndex(boundedIdx);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+    touchStartYRef.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartXRef.current;
+    const deltaY = touchEndY - touchStartYRef.current;
+
+    // Must be predominantly horizontal and exceed threshold (35px)
+    if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+      if (deltaX < 0) {
+        if (activeProjectIndex < PROJECTS.length - 1) {
+          handleSelectProject(activeProjectIndex + 1);
+        }
+      } else {
+        if (activeProjectIndex > 0) {
+          handleSelectProject(activeProjectIndex - 1);
+        }
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+  };
+
+  const handleTouchCancel = () => {
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+  };
+
+  const activeProject = PROJECTS[activeProjectIndex];
+
   return (
     <section
       id="projects"
-      className="relative bg-paper py-28 md:py-36 px-6 md:px-12 lg:px-16 border-t border-ink/10 selection:bg-accent/20"
+      className="relative bg-paper py-14 md:py-36 px-6 md:px-12 lg:px-16 border-t border-ink/10 selection:bg-accent/20"
     >
-      <div className="max-w-7xl mx-auto space-y-16">
+      <div className="max-w-7xl mx-auto space-y-10 md:space-y-16">
         {/* Section Header */}
         <div className="max-w-3xl">
           <div className="flex items-center gap-3 mb-4">
@@ -186,112 +340,86 @@ export const Projects: React.FC = () => {
           </p>
         </div>
 
-        {/* Project Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-          {PROJECTS.map((proj) => (
-            <div
-              key={proj.number}
-              className="group rounded-3xl border border-ink/15 bg-warm-50/70 hover:bg-warm-100/60 p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-ink/30 hover:shadow-xl"
-            >
-              <div className="space-y-6">
-                {/* Header row */}
-                <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
-                  <span className="font-mono text-2xl font-light text-accent">
-                    {proj.number}
-                  </span>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
-                      {proj.clientType}
-                    </span>
-                    {proj.url ? (
-                      <a
-                        href={proj.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${proj.urlLabel || 'View Project'}: ${proj.title}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-ink/5 hover:bg-accent hover:text-paper text-ink transition-all border border-ink/10 hover:border-accent ml-1 group/btn"
-                      >
-                        <span>{proj.urlLabel || 'View'}</span>
-                        <span className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5">
-                          ↗
-                        </span>
-                      </a>
-                    ) : (
-                      proj.urlLabel && (
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border ml-1 ${
-                            proj.urlLabel.toLowerCase().includes('construction')
-                              ? 'bg-amber-500/15 text-amber-950 font-semibold border-amber-500/40'
-                              : 'bg-ink/5 text-ink-muted border-ink/10'
-                          }`}
-                        >
-                          {proj.urlLabel.toLowerCase().includes('construction') && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                          )}
-                          <span>{proj.urlLabel}</span>
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                {/* Metric pill */}
-                <div className="inline-block px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
-                  {proj.highlightMetric}
-                </div>
-
-                {/* Title & Description */}
-                <div>
-                  {proj.url ? (
-                    <a
-                      href={proj.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/title inline-block"
-                    >
-                      <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover/title:text-accent transition-colors">
-                        {proj.title}
-                      </h3>
-                    </a>
-                  ) : (
-                    <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight group-hover:text-accent transition-colors">
-                      {proj.title}
-                    </h3>
-                  )}
-                  <p className="font-sans text-ink-muted text-sm sm:text-base leading-relaxed mt-3">
-                    {proj.description}
-                  </p>
-                </div>
-
-                {/* Key Architecture Highlights */}
-                <div className="space-y-2 pt-2 border-t border-ink/10">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-ink-muted block">
-                    Architecture &amp; Business Value:
-                  </span>
-                  <ul className="space-y-1.5 text-xs font-sans text-ink/90">
-                    {proj.architecturePoints.map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <span className="text-accent mt-0.5 shrink-0">✦</span>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Tech Stack Chips */}
-              <div className="pt-6 mt-6 border-t border-ink/10 flex flex-wrap gap-2">
-                {proj.stack.map((t) => (
-                  <span
-                    key={t}
-                    className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
+        {/* ================================================================= */}
+        {/* MOBILE ONLY (< 768px): INTERACTIVE SLIDER WITH SWIPE & PAGINATION */}
+        {/* ================================================================= */}
+        <div
+          className="md:hidden flex flex-col touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
+        >
+          {/* Top Navigation Bar: Stage Counter + Swipe Hint + Prev/Next Arrows */}
+          <div className="flex items-center justify-between pb-3.5 select-none">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="font-mono text-xs uppercase tracking-wider text-accent font-semibold">
+                PROJECT {activeProject.number} / 0{PROJECTS.length}
+              </span>
+              <span className="font-mono text-[10px] text-ink-muted">
+                · Swipe left/right
+              </span>
             </div>
-          ))}
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleSelectProject(activeProjectIndex - 1)}
+                disabled={activeProjectIndex === 0}
+                aria-label="Previous project"
+                className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm bg-warm-100 hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors shadow-2xs"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => handleSelectProject(activeProjectIndex + 1)}
+                disabled={activeProjectIndex === PROJECTS.length - 1}
+                aria-label="Next project"
+                className="w-9 h-9 rounded-full border border-ink/15 flex items-center justify-center text-ink text-sm bg-warm-100 hover:bg-ink hover:text-paper disabled:opacity-25 disabled:pointer-events-none transition-colors shadow-2xs"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          {/* Active Project Slide */}
+          {renderProjectCard(activeProject, true)}
+
+          {/* Bottom Controls & Pagination Bar */}
+          <div className="w-full flex flex-col items-center justify-between gap-4 pt-6 mt-6 border-t border-ink/10">
+            {/* Active Project Status */}
+            <div className="text-xs font-mono text-ink-muted flex items-center gap-2">
+              <span className="text-accent font-semibold">
+                PROJECT {activeProject.number} / 0{PROJECTS.length}
+              </span>
+              <span>·</span>
+              <span className="text-ink truncate max-w-[220px]">{activeProject.title}</span>
+            </div>
+
+            {/* Interactive Project Pills */}
+            <div className="flex items-center gap-2">
+              {PROJECTS.map((p, idx) => (
+                <button
+                  key={p.number}
+                  onClick={() => handleSelectProject(idx)}
+                  className="py-3.5 px-1.5 flex items-center justify-center cursor-pointer min-h-[44px]"
+                  aria-label={`Jump to project 0${idx + 1}: ${p.title}`}
+                >
+                  <span
+                    className={`h-2 rounded-full transition-all duration-300 block ${
+                      activeProjectIndex === idx ? 'w-10 bg-accent' : 'w-2.5 bg-ink/20 hover:bg-ink/40'
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ================================================================= */}
+        {/* DESKTOP / TABLET (>= 768px): ORIGINAL 2-COLUMN GRID               */}
+        {/* ================================================================= */}
+        <div className="hidden md:grid md:grid-cols-2 gap-8 lg:gap-10">
+          {PROJECTS.map((proj) => renderProjectCard(proj, false))}
         </div>
       </div>
     </section>
