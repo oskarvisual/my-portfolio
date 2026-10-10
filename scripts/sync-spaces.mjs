@@ -376,6 +376,8 @@ async function uploadBuiltAssets() {
       let contentType = 'application/octet-stream';
       if (ext === '.js' || ext === '.mjs') contentType = 'application/javascript; charset=utf-8';
       else if (ext === '.css') contentType = 'text/css; charset=utf-8';
+      else if (ext === '.woff2') contentType = 'font/woff2';
+      else if (ext === '.woff') contentType = 'font/woff';
       else if (ext === '.svg') contentType = 'image/svg+xml';
       else if (ext === '.webp') contentType = 'image/webp';
       else if (ext === '.png') contentType = 'image/png';
