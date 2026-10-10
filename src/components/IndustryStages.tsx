@@ -628,7 +628,11 @@ export const IndustryStages: React.FC = () => {
                 {/* Top gradient from black to completely transparent behind title/stage text; disappears when video ends */}
                 <div
                   aria-hidden="true"
-                  className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/85 via-black/45 to-transparent pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-40 pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(to bottom, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.66) 20%, rgba(0,0,0,0.45) 42%, rgba(0,0,0,0.24) 64%, rgba(0,0,0,0.09) 82%, rgba(0,0,0,0.02) 93%, rgba(0,0,0,0) 100%)',
+                  }}
                 />
 
                 {/* Mobile Audio Mute/Unmute Toggle (Bottom Left) */}
