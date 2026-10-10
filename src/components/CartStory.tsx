@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import cartV2Webp from '../assets/images/cart-v2.webp';
@@ -53,7 +53,7 @@ export const CartStory: React.FC = () => {
   const scene4Ref = useRef<HTMLDivElement>(null);
   const scene5Ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mm = gsap.matchMedia();
 
     const setupTimeline = (isMobile: boolean) => {
