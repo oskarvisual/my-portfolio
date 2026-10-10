@@ -194,51 +194,71 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
           </div>
 
           {/* Call-to-Action Group */}
-          <div className="pt-2 flex flex-wrap items-center gap-4 sm:gap-6">
-            <a
-              href="#cart-story"
-              onClick={handleScrollToCart}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-ink text-paper text-sm font-sans font-medium hover:bg-accent transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-            >
-              Explore my work
-            </a>
-
-            {/* Mobile-Only Red View Presentation Button */}
-            <button
-              type="button"
-              onClick={handleOpenModal}
-              className="lg:hidden inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#e62b1e] hover:bg-[#cc2216] text-white text-sm font-sans font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
-              aria-label="View presentation video"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-4 h-4 fill-white shrink-0"
-                aria-hidden="true"
+          <div className="pt-2 flex flex-col items-start gap-3.5 sm:gap-4">
+            {/* 1. Mobile-Only Red View Presentation Button (Solito arriba en móvil) */}
+            <div className="lg:hidden">
+              <button
+                type="button"
+                onClick={handleOpenModal}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#e62b1e] hover:bg-[#cc2216] text-white text-sm font-sans font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                aria-label="View presentation video"
               >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              <span>View presentation</span>
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4 fill-white shrink-0"
+                  aria-hidden="true"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <span>View presentation</span>
+              </button>
+            </div>
 
-            <a
-              href="https://calendly.com/oscarferher"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-ink/25 text-ink text-sm font-sans font-medium hover:border-ink hover:bg-warm-100 transition-all duration-300"
-            >
-              Let&apos;s talk
-            </a>
+            {/* 2. Main CTAs: On mobile, Explore my work & Let's talk together; on desktop, inline with Resume */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6">
+              <a
+                href="#cart-story"
+                onClick={handleScrollToCart}
+                className="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 rounded-full bg-ink text-paper text-sm font-sans font-medium hover:bg-accent transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Explore my work
+              </a>
 
-            <a
-              href={cvPdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              download="Oscar_Fernandez_CV.pdf"
-              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-ink-muted hover:text-ink transition-colors py-2 px-1 underline-offset-4 hover:underline"
-              title="Download Oscar Fernandez CV (PDF)"
-            >
-              Resume <span className="text-sm">↓</span>
-            </a>
+              <a
+                href="https://calendly.com/oscarferher"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-6 sm:px-7 py-3.5 rounded-full border border-ink/25 text-ink text-sm font-sans font-medium hover:border-ink hover:bg-warm-100 transition-all duration-300"
+              >
+                Let&apos;s talk
+              </a>
+
+              {/* Desktop-Only Resume Link (inline with the other buttons) */}
+              <a
+                href={cvPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                download="Oscar_Fernandez_CV.pdf"
+                className="hidden lg:inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-ink-muted hover:text-ink transition-colors py-2 px-1 underline-offset-4 hover:underline"
+                title="Download Oscar Fernandez CV (PDF)"
+              >
+                Resume <span className="text-sm">↓</span>
+              </a>
+            </div>
+
+            {/* 3. Mobile-Only Resume Link (Solito abajo en móvil) */}
+            <div className="lg:hidden pt-0.5">
+              <a
+                href={cvPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                download="Oscar_Fernandez_CV.pdf"
+                className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-ink-muted hover:text-ink transition-colors py-1.5 px-0.5 underline-offset-4 hover:underline"
+                title="Download Oscar Fernandez CV (PDF)"
+              >
+                Resume <span className="text-sm">↓</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
