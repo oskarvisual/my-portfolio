@@ -1,7 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import cvPdf from '../assets/docs/cv.pdf';
 import { HeroPhone } from './HeroPhone';
+import myPresentationVideo from '../assets/videos/my-presentation.mp4';
+import myPresentationPosterWebp from '../assets/images/my-presentation-v2.webp';
+import { getCdnVideoUrl, getCdnImageUrl } from '../utils/cdn';
+
+const presentationVideoUrl = getCdnVideoUrl(myPresentationVideo, 'my-presentation.mp4');
+const presentationPosterUrl = getCdnImageUrl(myPresentationPosterWebp, 'my-presentation-v2.webp');
 
 interface HeroProps {
   onExploreClick?: () => void;
@@ -76,6 +82,61 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
     }
   };
 
+  // Mobile Presentation Video Modal State & Handlers
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalVideoRef = useRef<HTMLVideoElement>(null);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const v = modalVideoRef.current;
+      if (v) {
+        try {
+          v.currentTime = 0;
+          v.volume = 1;
+          v.muted = false;
+        } catch {}
+        const playPromise = v.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('Playback with sound policy fallback:', err);
+            v.muted = true;
+            v.play().catch(console.error);
+          });
+        }
+      }
+    }, 60);
+  };
+
+  const handleCloseModal = () => {
+    const v = modalVideoRef.current;
+    if (v) {
+      try {
+        v.pause();
+      } catch {}
+    }
+    setIsModalOpen(false);
+    document.body.style.overflow = '';
+  };
+
+  const handleVideoEnded = () => {
+    handleCloseModal();
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        handleCloseModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
   return (
     <section
       id="hero"
@@ -141,6 +202,23 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
             >
               Explore my work
             </a>
+
+            {/* Mobile-Only Red View Presentation Button */}
+            <button
+              type="button"
+              onClick={handleOpenModal}
+              className="lg:hidden inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#e62b1e] hover:bg-[#cc2216] text-white text-sm font-sans font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+              aria-label="View presentation video"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 fill-white shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <span>View presentation</span>
+            </button>
 
             <a
               href="https://calendly.com/oscarferher"
@@ -222,6 +300,58 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Presentation Video Modal */}
+      {isModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Oscar Fernandez Presentation Video"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
+          {/* Modal Container: Aspect 9/16 vertical phone ratio */}
+          <div className="relative w-full max-w-[340px] sm:max-w-[380px] aspect-[9/16] max-h-[85vh] bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center">
+            {/* Close Button: Circular white background with black border and black X */}
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="absolute top-4 right-4 z-40 w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center text-black shadow-2xl hover:scale-105 active:scale-90 transition-transform cursor-pointer"
+              aria-label="Close presentation video"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-5 h-5 stroke-black stroke-[2.5]"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+            {/* Video Player */}
+            <video
+              ref={modalVideoRef}
+              src={presentationVideoUrl}
+              poster={presentationPosterUrl}
+              playsInline
+              webkit-playsinline="true"
+              controls
+              onEnded={handleVideoEnded}
+              className="w-full h-full object-cover block bg-black"
+              aria-label="Oscar Fernandez Presentation Video"
+            >
+              <track kind="captions" srcLang="en" label="English" default />
+            </video>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
