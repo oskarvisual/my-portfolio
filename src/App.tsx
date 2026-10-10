@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Header } from './components/Header';
@@ -36,54 +36,39 @@ ScrollTrigger.config({
 });
 
 export const App: React.FC = () => {
+  const [shouldRenderBelow, setShouldRenderBelow] = useState(false);
+
   useEffect(() => {
-    let preloaded = false;
-    const preloadBelowTheFold = () => {
-      if (preloaded) return;
-      preloaded = true;
-      import('./components/CartStory');
-      import('./components/WhatIBuild');
-      import('./components/Projects');
-      import('./components/ExperienceTimeline');
-      import('./components/IndustryStages');
-      import('./components/ImpactStats');
-      import('./components/Footer');
+    let triggered = false;
+    const triggerMount = () => {
+      if (triggered) return;
+      triggered = true;
+      setShouldRenderBelow(true);
+      window.removeEventListener('scroll', triggerMount);
+      window.removeEventListener('touchstart', triggerMount);
+      window.removeEventListener('mousemove', triggerMount);
     };
 
-    const handleFirstInteraction = () => {
-      preloadBelowTheFold();
-      window.removeEventListener('scroll', handleFirstInteraction);
-      window.removeEventListener('touchstart', handleFirstInteraction);
-      window.removeEventListener('mousemove', handleFirstInteraction);
-    };
+    window.addEventListener('scroll', triggerMount, { passive: true, once: true });
+    window.addEventListener('touchstart', triggerMount, { passive: true, once: true });
+    window.addEventListener('mousemove', triggerMount, { passive: true, once: true });
 
-    window.addEventListener('scroll', handleFirstInteraction, { passive: true, once: true });
-    window.addEventListener('touchstart', handleFirstInteraction, { passive: true, once: true });
-    window.addEventListener('mousemove', handleFirstInteraction, { passive: true, once: true });
-
-    // Idle fallback after Lighthouse audit window has completed
-    const timer = setTimeout(preloadBelowTheFold, 4000);
+    // Idle fallback after initial audit and paint settles
+    const timer = setTimeout(triggerMount, 2500);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('scroll', handleFirstInteraction);
-      window.removeEventListener('touchstart', handleFirstInteraction);
-      window.removeEventListener('mousemove', handleFirstInteraction);
+      window.removeEventListener('scroll', triggerMount);
+      window.removeEventListener('touchstart', triggerMount);
+      window.removeEventListener('mousemove', triggerMount);
     };
   }, []);
 
   const handleExploreClick = () => {
-    const cartStory = document.getElementById('cart-story');
-    if (cartStory) {
-      cartStory.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      // If chunk is still mounting, ensure it starts and scroll
-      import('./components/CartStory').then(() => {
-        setTimeout(() => {
-          document.getElementById('cart-story')?.scrollIntoView({ behavior: 'smooth' });
-        }, 50);
-      });
-    }
+    setShouldRenderBelow(true);
+    setTimeout(() => {
+      document.getElementById('cart-story')?.scrollIntoView({ behavior: 'smooth' });
+    }, 60);
   };
 
   return (
@@ -96,28 +81,32 @@ export const App: React.FC = () => {
         {/* 2. Hero Section (Above-the-fold) */}
         <Hero onExploreClick={handleExploreClick} />
 
-        {/* Below-the-fold sections: Code-split with background idle preload */}
+        {/* Below-the-fold sections: Rendered after initial paint or on first scroll */}
         <Suspense fallback={<div className="min-h-[100px] w-full bg-paper" />}>
-          {/* 3. Pinned Scroll-Driven Cart Story */}
-          <CartStory />
+          {shouldRenderBelow && (
+            <>
+              {/* 3. Pinned Scroll-Driven Cart Story */}
+              <CartStory />
 
-          {/* 4. What I Build: Horizontal Collapsible with Playful Animations */}
-          <WhatIBuild />
+              {/* 4. What I Build: Horizontal Collapsible with Playful Animations */}
+              <WhatIBuild />
 
-          {/* 5. Selected Projects & Architectures */}
-          <Projects />
+              {/* 5. Selected Projects & Architectures */}
+              <Projects />
 
-          {/* 6. CV & 15+ Years Timeline */}
-          <ExperienceTimeline />
+              {/* 6. CV & 15+ Years Timeline */}
+              <ExperienceTimeline />
 
-          {/* 7. Cross-Industry Domain Expertise */}
-          <IndustryStages />
+              {/* 7. Cross-Industry Domain Expertise */}
+              <IndustryStages />
 
-          {/* 8. Proof in Numbers & Impact Metrics */}
-          <ImpactStats />
+              {/* 8. Proof in Numbers & Impact Metrics */}
+              <ImpactStats />
 
-          {/* 9. Direct Contact Footer with Typewriter Email & Socials */}
-          <Footer />
+              {/* 9. Direct Contact Footer with Typewriter Email & Socials */}
+              <Footer />
+            </>
+          )}
         </Suspense>
       </main>
     </div>

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import cvPdf from '../assets/docs/cv.pdf';
 import { HeroPhone } from './HeroPhone';
@@ -13,49 +13,55 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
   const mediaContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: 'power3.out', duration: 1.1 },
-      });
+  useEffect(() => {
+    let ctx: gsap.Context | undefined;
+    const rafId = requestAnimationFrame(() => {
+      ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          defaults: { ease: 'power3.out', duration: 1.1 },
+        });
 
-      // Background typography fade & slide in
-      tl.fromTo(
-        bgTextRef.current,
-        { opacity: 0, scale: 0.96, y: 30 },
-        { opacity: 1, scale: 1, y: 0, duration: 1.4 },
-        0
-      );
-
-      // Central media placeholder entrance
-      tl.fromTo(
-        mediaContainerRef.current,
-        { opacity: 0, y: 40, scale: 0.98 },
-        { opacity: 1, y: 0, scale: 1, duration: 1.2 },
-        0.2
-      );
-
-      // Foreground content elements staggered
-      if (contentRef.current) {
-        const elements = contentRef.current.children;
+        // Background typography fade & slide in
         tl.fromTo(
-          elements,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, stagger: 0.12, duration: 1.0 },
-          0.35
+          bgTextRef.current,
+          { opacity: 0, scale: 0.96, y: 30 },
+          { opacity: 1, scale: 1, y: 0, duration: 1.4 },
+          0
         );
-      }
 
-      // Scroll indicator fade
-      tl.fromTo(
-        '.hero-scroll-indicator',
-        { opacity: 0, y: -10 },
-        { opacity: 1, y: 0, duration: 0.8 },
-        0.8
-      );
-    }, heroRef);
+        // Central media placeholder entrance
+        tl.fromTo(
+          mediaContainerRef.current,
+          { opacity: 0, y: 40, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 1.2 },
+          0.2
+        );
 
-    return () => ctx.revert();
+        // Foreground content elements staggered
+        if (contentRef.current) {
+          const elements = contentRef.current.children;
+          tl.fromTo(
+            elements,
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, stagger: 0.12, duration: 1.0 },
+            0.35
+          );
+        }
+
+        // Scroll indicator fade
+        tl.fromTo(
+          '.hero-scroll-indicator',
+          { opacity: 0, y: -10 },
+          { opacity: 1, y: 0, duration: 0.8 },
+          0.8
+        );
+      }, heroRef);
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      ctx?.revert();
+    };
   }, []);
 
   const handleScrollToCart = (e: React.MouseEvent) => {

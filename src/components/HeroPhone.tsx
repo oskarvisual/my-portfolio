@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import iphoneFrame from '../assets/images/iphone-17.svg';
 import myPresentationVideo from '../assets/videos/my-presentation.mp4';
-import myPresentationPosterWebp from '../assets/images/my-presentation.webp';
+import myPresentationPosterWebp from '../assets/images/my-presentation-v2.webp';
 import myPresentationPosterPng from '../assets/images/my-presentation.png';
 import cvPdf from '../assets/docs/cv.pdf';
 import { getCdnVideoUrl, getCdnImageUrl } from '../utils/cdn';
 
 const defaultPresentationVideo = getCdnVideoUrl(myPresentationVideo, 'my-presentation.mp4');
-const defaultPresentationPoster = getCdnImageUrl(myPresentationPosterWebp, 'my-presentation.webp');
+const defaultPresentationPoster = getCdnImageUrl(myPresentationPosterWebp, 'my-presentation-v2.webp');
 const resolvedIphoneFrame = getCdnImageUrl(iphoneFrame, 'iphone-17.svg');
 
 interface HeroPhoneProps {
@@ -190,8 +190,8 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
             src={defaultPresentationPoster}
             alt="Oscar Fernandez Presentation Preview"
             className="absolute inset-0 w-full h-full object-cover block z-[5] pointer-events-none"
-            width={720}
-            height={1280}
+            width={294}
+            height={522}
             onError={(e) => {
               if (e.currentTarget.src !== myPresentationPosterPng) {
                 e.currentTarget.src = myPresentationPosterPng;

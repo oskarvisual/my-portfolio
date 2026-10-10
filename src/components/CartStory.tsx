@@ -1,11 +1,13 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import cartWebp from '../assets/images/cart.webp';
+import cartV2Webp from '../assets/images/cart-v2.webp';
+import cartMobileV2Webp from '../assets/images/cart-mobile-v2.webp';
 import floorWebp from '../assets/images/floor.webp';
 import { getCdnImageUrl } from '../utils/cdn';
 
-const resolvedCartImage = getCdnImageUrl(cartWebp, 'cart.webp');
+const resolvedCartImage = getCdnImageUrl(cartV2Webp, 'cart-v2.webp');
+const resolvedCartMobile = getCdnImageUrl(cartMobileV2Webp, 'cart-mobile-v2.webp');
 const resolvedFloorImage = getCdnImageUrl(floorWebp, 'floor.webp');
 
 gsap.registerPlugin(ScrollTrigger);
@@ -51,7 +53,7 @@ export const CartStory: React.FC = () => {
   const scene4Ref = useRef<HTMLDivElement>(null);
   const scene5Ref = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const mm = gsap.matchMedia();
 
     const setupTimeline = (isMobile: boolean) => {
@@ -384,11 +386,13 @@ export const CartStory: React.FC = () => {
             {/* Cart Top-down Image */}
             <img
               src={resolvedCartImage}
-              width={1143}
-              height={1442}
+              srcSet={`${resolvedCartMobile} 300w, ${resolvedCartImage} 500w`}
+              sizes="(max-width: 768px) 270px, 470px"
+              width={470}
+              height={593}
               onError={(e) => {
-                if (e.currentTarget.src !== cartWebp) {
-                  e.currentTarget.src = cartWebp;
+                if (e.currentTarget.src !== cartV2Webp) {
+                  e.currentTarget.src = cartV2Webp;
                 }
               }}
               alt="Shopping cart filled with modern technology plush mascots"

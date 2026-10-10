@@ -121,22 +121,33 @@ async function optimizeImages() {
     console.log(`   ✅ floor.webp generated: ${oldSz} KB -> ${newSz} KB`);
   }
 
-  // 2. cart.png (Shopping cart with alpha) -> cart.webp
+  // 2. cart.png (Shopping cart with alpha) -> cart-v2.webp (desktop 500px) & cart-mobile-v2.webp (mobile 300px)
   const cartPng = path.join(imagesDir, 'cart.png');
+  const cartV2 = path.join(imagesDir, 'cart-v2.webp');
+  const cartMobileV2 = path.join(imagesDir, 'cart-mobile-v2.webp');
   const cartWebp = path.join(imagesDir, 'cart.webp');
-  const shouldRegenCart = !fs.existsSync(cartWebp) || 
-    fs.statSync(cartWebp).size > 180000 || 
-    (fs.existsSync(cartPng) && fs.statSync(cartPng).mtimeMs > fs.statSync(cartWebp).mtimeMs);
 
-  if (fs.existsSync(cartPng) && shouldRegenCart) {
-    console.log('   Converting cart.png to optimized transparent WebP (max-w 650px, q78, effort 6)...');
-    await sharp(cartPng)
-      .resize(650, null, { fit: 'inside' })
-      .webp({ quality: 78, effort: 6 })
-      .toFile(cartWebp);
-    const oldSz = (fs.statSync(cartPng).size / 1024).toFixed(1);
-    const newSz = (fs.statSync(cartWebp).size / 1024).toFixed(1);
-    console.log(`   ✅ cart.webp generated: ${oldSz} KB -> ${newSz} KB`);
+  if (fs.existsSync(cartPng)) {
+    if (!fs.existsSync(cartV2) || fs.statSync(cartV2).size > 120000 || fs.statSync(cartPng).mtimeMs > fs.statSync(cartV2).mtimeMs) {
+      console.log('   Converting cart.png to desktop WebP cart-v2.webp (max-w 500px, q78, effort 6)...');
+      await sharp(cartPng)
+        .resize(500, null, { fit: 'inside' })
+        .webp({ quality: 78, effort: 6 })
+        .toFile(cartV2);
+      fs.copyFileSync(cartV2, cartWebp);
+      const newSz = (fs.statSync(cartV2).size / 1024).toFixed(1);
+      console.log(`   ✅ cart-v2.webp generated: ${newSz} KB`);
+    }
+
+    if (!fs.existsSync(cartMobileV2) || fs.statSync(cartMobileV2).size > 60000 || fs.statSync(cartPng).mtimeMs > fs.statSync(cartMobileV2).mtimeMs) {
+      console.log('   Converting cart.png to mobile WebP cart-mobile-v2.webp (max-w 300px, q78, effort 6)...');
+      await sharp(cartPng)
+        .resize(300, null, { fit: 'inside' })
+        .webp({ quality: 78, effort: 6 })
+        .toFile(cartMobileV2);
+      const newSz = (fs.statSync(cartMobileV2).size / 1024).toFixed(1);
+      console.log(`   ✅ cart-mobile-v2.webp generated: ${newSz} KB`);
+    }
   }
 
   // 3. open-to-work.jpg -> open-to-work.webp
@@ -150,17 +161,21 @@ async function optimizeImages() {
     console.log('   ✅ open-to-work.webp generated');
   }
 
-  // 4. my-presentation.png -> my-presentation.webp
+  // 4. my-presentation.png -> my-presentation-v2.webp (exact 360x640 mobile preview)
   const presPng = path.join(imagesDir, 'my-presentation.png');
+  const presV2 = path.join(imagesDir, 'my-presentation-v2.webp');
   const presWebp = path.join(imagesDir, 'my-presentation.webp');
-  if (fs.existsSync(presPng) && (!fs.existsSync(presWebp) || fs.statSync(presPng).mtimeMs > fs.statSync(presWebp).mtimeMs)) {
-    console.log('   Converting my-presentation.png to WebP (q85, effort 6)...');
-    await sharp(presPng)
-      .webp({ quality: 85, effort: 6 })
-      .toFile(presWebp);
-    const oldSz = (fs.statSync(presPng).size / 1024).toFixed(1);
-    const newSz = (fs.statSync(presWebp).size / 1024).toFixed(1);
-    console.log(`   ✅ my-presentation.webp generated: ${oldSz} KB -> ${newSz} KB`);
+  if (fs.existsSync(presPng)) {
+    if (!fs.existsSync(presV2) || fs.statSync(presV2).size > 10000 || fs.statSync(presPng).mtimeMs > fs.statSync(presV2).mtimeMs) {
+      console.log('   Converting my-presentation.png to WebP my-presentation-v2.webp (360x640, q80, effort 6)...');
+      await sharp(presPng)
+        .resize(360, 640, { fit: 'inside' })
+        .webp({ quality: 80, effort: 6 })
+        .toFile(presV2);
+      fs.copyFileSync(presV2, presWebp);
+      const newSz = (fs.statSync(presV2).size / 1024).toFixed(1);
+      console.log(`   ✅ my-presentation-v2.webp generated: ${newSz} KB`);
+    }
   }
 }
 

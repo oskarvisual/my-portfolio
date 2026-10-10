@@ -18,14 +18,9 @@ export default defineConfig(({ command, mode }) => {
   const destDir = (env.DO_SPACES_DEST_DIR || process.env.DO_SPACES_DEST_DIR || 'my-portfolio/videos').trim();
   const projectRoot = destDir.replace(/^\/+|\/+$/g, '').replace(/\/?(videos|images|assets).*$/, '') || 'my-portfolio';
 
-  let base = '/my-portfolio/';
-  if (rawCdn) {
-    // Strip trailing /videos, /images, or /assets if present in rawCdn URL
-    const cleanCdn = rawCdn.replace(/\/+$/, '').replace(/\/(videos|images|assets).*$/, '');
-    base = `${cleanCdn}/`;
-  } else if (bucket) {
-    base = `https://${bucket}.${region}.cdn.digitaloceanspaces.com/${projectRoot}/`;
-  }
+  // Always serve root application bundle (HTML, CSS, JS, fonts) from GitHub Pages origin
+  // to avoid cross-origin render-blocking chains. Media (videos & large images) are served via CDN in cdn.ts.
+  const base = '/my-portfolio/';
 
   return {
     plugins: [react()],
