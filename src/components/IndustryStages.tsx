@@ -138,12 +138,14 @@ export const IndustryStages: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false); // Default unmuted as requested ("con sonido")
   const [isSectionInView, setIsSectionInView] = useState(false);
   const [isNearSection, setIsNearSection] = useState(false);
+  const [mobileVideoEnded, setMobileVideoEnded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
   const isProgrammaticScrollRef = useRef(false);
   const programmaticTimeoutRef = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const mobileVideoRef = useRef<HTMLVideoElement | null>(null);
 
   // Pinned scroll-trigger setup (Desktop: >= 1024px)
   useLayoutEffect(() => {
@@ -226,7 +228,7 @@ export const IndustryStages: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Reset video to start when active stage changes
+  // Reset desktop video to start when active stage changes
   useEffect(() => {
     const video = videoRefs.current[activeStageIndex];
     if (video) {
@@ -276,6 +278,41 @@ export const IndustryStages: React.FC = () => {
     });
   }, [activeStageIndex, isMuted, isSectionInView]);
 
+  // Mobile-only video playback management (< 1024px)
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.innerWidth >= 1024) return;
+    const video = mobileVideoRef.current;
+    if (!video) return;
+
+    video.muted = isMuted;
+
+    if (isSectionInView && !mobileVideoEnded) {
+      const startMobilePlay = () => {
+        try {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              if (!video.muted) {
+                video.muted = true;
+                video.play().catch(() => {});
+              }
+            });
+          }
+        } catch {}
+      };
+
+      if (video.readyState >= 2) {
+        startMobilePlay();
+      } else {
+        video.addEventListener('canplay', startMobilePlay, { once: true });
+        video.addEventListener('loadeddata', startMobilePlay, { once: true });
+        startMobilePlay();
+      }
+    } else {
+      video.pause();
+    }
+  }, [activeStageIndex, isSectionInView, mobileVideoEnded, isMuted]);
+
   // Audio mute/unmute toggle (applies globally to all videos)
   const toggleAudio = () => {
     setIsMuted((prev) => {
@@ -285,12 +322,30 @@ export const IndustryStages: React.FC = () => {
           v.muted = next;
         }
       });
+      if (mobileVideoRef.current) {
+        mobileVideoRef.current.muted = next;
+        if (!next && !mobileVideoEnded) {
+          mobileVideoRef.current.play().catch(() => {});
+        }
+      }
       const activeVideo = videoRefs.current[activeStageIndex];
-      if (activeVideo && !next) {
+      if (activeVideo && !next && window.innerWidth >= 1024) {
         activeVideo.play().catch(() => {});
       }
       return next;
     });
+  };
+
+  // Replay mobile video from the beginning
+  const handleReplayMobileVideo = () => {
+    setMobileVideoEnded(false);
+    const v = mobileVideoRef.current;
+    if (v) {
+      try {
+        v.currentTime = 0;
+        v.play().catch(() => {});
+      } catch {}
+    }
   };
 
   // Mobile swipe gestures (swipe left = next, swipe right = prev)
@@ -338,6 +393,7 @@ export const IndustryStages: React.FC = () => {
   // Programmatic jump to a specific industry stage (via arrows or pagination dots)
   const handleSelectStage = (idx: number) => {
     const boundedIdx = Math.max(0, Math.min(INDUSTRY_VERTICALS.length - 1, idx));
+    setMobileVideoEnded(false);
     setActiveStageIndex(boundedIdx);
 
     const st = scrollTriggerRef.current;
@@ -541,73 +597,208 @@ export const IndustryStages: React.FC = () => {
 
             <div
               key={activeVertical.id}
-              className="rounded-3xl border border-ink/15 bg-warm-50/90 shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between h-full animate-fade-in transition-all duration-300"
+              className={`rounded-3xl border shadow-sm p-7 sm:p-9 xl:p-11 flex flex-col justify-between h-full animate-fade-in transition-colors duration-700 ease-in-out ${
+                !mobileVideoEnded
+                  ? 'bg-ink border-ink lg:bg-warm-50/90 lg:border-ink/15'
+                  : 'bg-warm-50/90 border-ink/15'
+              }`}
             >
               <div className="space-y-6">
-                {/* Header Row: Number & Client Context */}
-                <div className="flex flex-wrap items-center justify-between gap-y-2 border-b border-ink/10 pb-4">
+                {/* Header Row: Number & Client Context (White on mobile during video, original colors after video ends & always on desktop) */}
+                <div
+                  className={`flex flex-wrap items-center justify-between gap-y-2 border-b pb-4 transition-colors duration-700 ${
+                    !mobileVideoEnded
+                      ? 'border-transparent lg:border-ink/10'
+                      : 'border-ink/10'
+                  }`}
+                >
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-3xl font-light text-accent">
+                    <span
+                      className={`font-mono text-3xl font-light transition-colors duration-700 ${
+                        !mobileVideoEnded
+                          ? 'text-white lg:text-accent'
+                          : 'text-accent'
+                      }`}
+                    >
                       {activeVertical.number}
                     </span>
-                    <span className="font-mono text-xs uppercase tracking-wider text-ink font-semibold">
+                    <span
+                      className={`font-mono text-xs uppercase tracking-wider font-semibold transition-colors duration-700 ${
+                        !mobileVideoEnded
+                          ? 'text-white lg:text-ink'
+                          : 'text-ink'
+                      }`}
+                    >
                       {activeVertical.industry}
                     </span>
                   </div>
-                  <span className="font-mono text-[11px] uppercase tracking-wider text-ink-muted">
+                  <span
+                    className={`font-mono text-[11px] uppercase tracking-wider transition-colors duration-700 ${
+                      !mobileVideoEnded
+                        ? 'text-white/80 lg:text-ink-muted'
+                        : 'text-ink-muted'
+                    }`}
+                  >
                     {activeVertical.proofClient}
                   </span>
                 </div>
 
-                {/* Metric Highlight Pill & Roleplay Badge */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="inline-block px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
-                    {activeVertical.highlightMetric}
-                  </div>
-
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-paper border border-ink/10 font-mono text-[11px] text-ink-muted">
-                    <span className="text-accent">🎭</span>
-                    <span className="font-semibold text-ink">{activeVertical.characterTitle}</span>
-                  </div>
-                </div>
-
-                {/* Headline & 2-Part Domain Challenge */}
-                <div className="space-y-4">
-                  <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight">
-                    {activeVertical.headline}
-                  </h3>
-
-                  <div className="space-y-3.5 pt-1">
-                    <div>
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-accent font-semibold block mb-1">
-                        The Industry Reality:
-                      </span>
-                      <p className="font-sans text-sm sm:text-base text-ink-muted leading-relaxed">
-                        {activeVertical.hardProblem}
-                      </p>
-                    </div>
-
-                    <div className="pt-2">
-                      <span className="font-mono text-[10px] uppercase tracking-wider text-accent font-semibold block mb-1">
-                        Engineered Solution &amp; Impact:
-                      </span>
-                      <p className="font-sans text-sm sm:text-base text-ink/90 leading-relaxed font-medium">
-                        {activeVertical.deliverables}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Domain Tags / Tech Skills */}
-                <div className="pt-5 border-t border-ink/10 flex flex-wrap gap-2">
-                  {activeVertical.domainTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
+                {/* Body Grid: Shares 1 cell on mobile so video fades smoothly into text with zero layout shift */}
+                <div className="grid grid-cols-1">
+                  {/* LAYER 1: Mobile-Only Video Stage (Plays first, then fades into card background color on end) */}
+                  <div
+                    className={`col-start-1 row-start-1 lg:hidden w-full h-full min-h-[390px] rounded-2xl overflow-hidden relative transition-all duration-700 ease-in-out ${
+                      !mobileVideoEnded
+                        ? 'opacity-100 scale-100 z-10 pointer-events-auto'
+                        : 'opacity-0 scale-[0.98] z-0 pointer-events-none'
+                    }`}
+                  >
+                    <video
+                      ref={mobileVideoRef}
+                      src={isNearSection ? activeVertical.videoSrc : undefined}
+                      playsInline
+                      webkit-playsinline="true"
+                      muted={isMuted}
+                      loop={false}
+                      preload={isNearSection ? 'auto' : 'none'}
+                      onClick={toggleAudio}
+                      onEnded={() => {
+                        setMobileVideoEnded(true);
+                      }}
+                      className="w-full h-full object-cover object-top block bg-paper rounded-2xl"
+                      aria-label={`${activeVertical.industry} vertical video`}
                     >
-                      {tag}
-                    </span>
-                  ))}
+                      <track kind="captions" srcLang="en" label="English" default />
+                    </video>
+
+                    {/* Mobile Audio Mute/Unmute Toggle (Bottom Left) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleAudio();
+                      }}
+                      aria-label={isMuted ? 'Unmute video audio' : 'Mute video audio'}
+                      className="absolute bottom-3.5 left-3.5 z-20 w-9 h-9 rounded-full bg-white/95 text-ink shadow-md border border-ink/10 flex items-center justify-center transition-transform active:scale-95"
+                    >
+                      {isMuted ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4 text-ink/70"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <line x1="23" y1="9" x2="17" y2="15" />
+                          <line x1="17" y1="9" x2="23" y2="15" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4 text-accent"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Mobile Skip Video Pill (Bottom Right) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (mobileVideoRef.current) {
+                          mobileVideoRef.current.pause();
+                        }
+                        setMobileVideoEnded(true);
+                      }}
+                      className="absolute bottom-3.5 right-3.5 z-20 px-3.5 py-1.5 rounded-full bg-ink/80 text-white font-mono text-[11px] uppercase tracking-wider backdrop-blur-xs shadow-md hover:bg-ink transition-colors"
+                    >
+                      Skip →
+                    </button>
+                  </div>
+
+                  {/* LAYER 2: Text Content (Revealed on mobile after video ends; always visible on desktop) */}
+                  <div
+                    className={`col-start-1 row-start-1 space-y-6 transition-all duration-700 ease-out ${
+                      !mobileVideoEnded
+                        ? 'opacity-0 translate-y-2 pointer-events-none select-none lg:opacity-100 lg:translate-y-0 lg:pointer-events-auto lg:select-auto'
+                        : 'opacity-100 translate-y-0 pointer-events-auto'
+                    }`}
+                  >
+                    {/* Metric Highlight Pill & Roleplay Badge */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="inline-block px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold">
+                        {activeVertical.highlightMetric}
+                      </div>
+
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-paper border border-ink/10 font-mono text-[11px] text-ink-muted">
+                        <span className="text-accent">🎭</span>
+                        <span className="font-semibold text-ink">{activeVertical.characterTitle}</span>
+                      </div>
+
+                      {/* Mobile-Only Replay Video Button */}
+                      <button
+                        type="button"
+                        onClick={handleReplayMobileVideo}
+                        className="lg:hidden inline-flex items-center gap-1 px-3 py-1 rounded-full bg-ink text-paper font-mono text-[11px] hover:bg-accent transition-colors"
+                      >
+                        <span>↺</span>
+                        <span>Replay video</span>
+                      </button>
+                    </div>
+
+                    {/* Headline & 2-Part Domain Challenge */}
+                    <div className="space-y-4">
+                      <h3 className="text-2xl sm:text-3xl font-sans font-bold text-ink tracking-tight">
+                        {activeVertical.headline}
+                      </h3>
+
+                      <div className="space-y-3.5 pt-1">
+                        <div>
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-accent font-semibold block mb-1">
+                            The Industry Reality:
+                          </span>
+                          <p className="font-sans text-sm sm:text-base text-ink-muted leading-relaxed">
+                            {activeVertical.hardProblem}
+                          </p>
+                        </div>
+
+                        <div className="pt-2">
+                          <span className="font-mono text-[10px] uppercase tracking-wider text-accent font-semibold block mb-1">
+                            Engineered Solution &amp; Impact:
+                          </span>
+                          <p className="font-sans text-sm sm:text-base text-ink/90 leading-relaxed font-medium">
+                            {activeVertical.deliverables}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Domain Tags / Tech Skills */}
+                    <div className="pt-5 border-t border-ink/10 flex flex-wrap gap-2">
+                      {activeVertical.domainTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-1 rounded-md text-[11px] font-mono text-ink-muted bg-paper border border-ink/10"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
