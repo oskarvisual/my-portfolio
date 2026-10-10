@@ -628,7 +628,7 @@ export const IndustryStages: React.FC = () => {
                 {/* Top gradient from black to completely transparent behind title/stage text; disappears when video ends */}
                 <div
                   aria-hidden="true"
-                  className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/85 via-black/45 to-transparent pointer-events-none"
+                  className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/85 via-black/45 to-transparent pointer-events-none"
                 />
 
                 {/* Mobile Audio Mute/Unmute Toggle (Bottom Left) */}
@@ -700,7 +700,13 @@ export const IndustryStages: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-3xl font-light text-accent">
+                    <span
+                      className={`font-mono text-3xl font-light transition-colors duration-700 ${
+                        !mobileVideoEnded
+                          ? 'text-white lg:text-accent'
+                          : 'text-accent'
+                      }`}
+                    >
                       {activeVertical.number}
                     </span>
                     <span
