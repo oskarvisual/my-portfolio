@@ -33,10 +33,10 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? 'bg-paper/85 backdrop-blur-md py-4 border-b border-ink/5 shadow-[0_2px_20px_-10px_rgba(0,0,0,0.05)]'
-          : 'bg-transparent py-6 md:py-8'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 before:content-[''] before:absolute before:inset-0 before:-z-10 before:transition-all before:duration-500 ${
+        isScrolled || mobileMenuOpen
+          ? 'py-4 before:bg-paper/80 before:backdrop-blur-xl border-b border-ink/5 shadow-[0_2px_20px_-10px_rgba(0,0,0,0.05)]'
+          : 'py-6 md:py-8 before:bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
@@ -83,11 +83,11 @@ export const Header: React.FC = () => {
           </div>
         </button>
 
-        {/* Single Unified Navigation Menu (Drawer below 1200px, inline horizontal bar at >= 1200px) */}
+        {/* Single Unified Navigation Menu (Frosted glass drawer below 1200px across the whole site, inline horizontal bar at >= 1200px) */}
         <nav
           className={`${
             mobileMenuOpen ? 'flex' : 'hidden'
-          } min-[1200px]:flex flex-col min-[1200px]:flex-row items-stretch min-[1200px]:items-center gap-4 min-[1200px]:gap-6 xl:gap-7 absolute min-[1200px]:static top-full left-0 right-0 bg-paper/98 min-[1200px]:bg-transparent backdrop-blur-xl min-[1200px]:backdrop-blur-none border-b border-ink/10 min-[1200px]:border-0 px-6 py-6 min-[1200px]:p-0 shadow-lg min-[1200px]:shadow-none`}
+          } min-[1200px]:flex flex-col min-[1200px]:flex-row items-stretch min-[1200px]:items-center gap-4 min-[1200px]:gap-6 xl:gap-7 absolute min-[1200px]:static top-full left-0 right-0 bg-paper/75 min-[1200px]:bg-transparent backdrop-blur-xl min-[1200px]:backdrop-blur-none border-b border-ink/10 min-[1200px]:border-0 px-6 py-6 min-[1200px]:p-0 shadow-lg min-[1200px]:shadow-none`}
         >
           {NAV_ITEMS.map((item) => (
             <button
