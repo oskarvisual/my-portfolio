@@ -47,13 +47,14 @@ export const Header: React.FC = () => {
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 lg:gap-8">
+        <nav className="hidden md:flex items-center gap-6 lg:gap-7">
           {[
             { label: 'Story', target: 'cart-story' },
             { label: 'Capabilities', target: 'what-i-build' },
             { label: 'Projects', target: 'projects' },
             { label: 'Experience', target: 'experience' },
             { label: 'Industries', target: 'industries' },
+            { label: 'Numbers', target: 'numbers' },
             { label: 'Contact', target: 'contact' },
           ].map((item) => (
             <button
@@ -110,6 +111,7 @@ export const Header: React.FC = () => {
             { label: 'Projects', target: 'projects' },
             { label: 'Experience', target: 'experience' },
             { label: 'Industries', target: 'industries' },
+            { label: 'Numbers', target: 'numbers' },
             { label: 'Contact', target: 'contact' },
           ].map((item) => (
             <div key={item.label}>

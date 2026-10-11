@@ -151,7 +151,7 @@ export const Footer: React.FC = () => {
           <p className="font-mono text-xs uppercase tracking-widest text-ink-muted mb-4">
             DIRECT CONTACT & SOCIAL PROFILES
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Calendly Booking */}
             <a
               href="https://calendly.com/oscarferher"
@@ -173,52 +173,6 @@ export const Footer: React.FC = () => {
                 </span>
                 <span className="font-mono text-xs font-bold text-ink group-hover:text-accent transition-colors flex items-center gap-1 truncate">
                   <span>/oscarferher</span>
-                  <span className="text-[10px] opacity-60">↗</span>
-                </span>
-              </div>
-            </a>
-
-            {/* Direct Phone / Call */}
-            <a
-              href="tel:+51977675421"
-              className="p-5 rounded-2xl bg-paper hover:bg-white border border-ink/15 hover:border-ink transition-all group flex items-center gap-4 shadow-2xs hover:shadow-md"
-            >
-              <div className="w-11 h-11 rounded-xl bg-ink/10 text-ink flex items-center justify-center group-hover:bg-ink group-hover:text-paper transition-colors shrink-0">
-                <svg className="w-5 h-5 fill-none stroke-current" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted block truncate">
-                  Direct Phone Call
-                </span>
-                <span className="font-mono text-xs font-bold text-ink group-hover:text-ink transition-colors flex items-center gap-1 truncate">
-                  <span>+51 977 675 421</span>
-                  <span className="text-[10px] opacity-60">↗</span>
-                </span>
-              </div>
-            </a>
-
-            {/* Official WhatsApp */}
-            <a
-              href="https://wa.me/51977675421?text=Hi%20Oscar%2C%20I%20saw%20your%20portfolio%20and%20would%20like%20to%20connect."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-5 rounded-2xl bg-paper hover:bg-white border border-ink/15 hover:border-[#25D366] transition-all group flex items-center gap-4 shadow-2xs hover:shadow-md"
-            >
-              <div className="w-11 h-11 rounded-xl bg-[#25D366]/15 text-[#25D366] flex items-center justify-center group-hover:bg-[#25D366] group-hover:text-white transition-colors shrink-0">
-                {/* Official WhatsApp SVG Icon */}
-                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.53 1.838.814 2.791.814 3.179 0 5.765-2.586 5.766-5.766 0-3.18-2.586-5.766-5.766-5.766zm3.385 8.165c-.141.396-.714.733-1.002.779-.276.044-.632.067-1.026-.06-.242-.078-.553-.186-.957-.361-1.688-.73-2.776-2.457-2.861-2.57-.084-.114-.683-.91-.683-1.735 0-.825.433-1.231.587-1.398.154-.167.336-.209.448-.209.112 0 .224.001.322.006.105.005.244-.04.382.292.141.341.482 1.176.524 1.262.042.086.07.186.014.299-.056.113-.084.183-.168.282-.084.099-.177.221-.252.297-.084.084-.172.176-.074.344.098.168.437.721.937 1.167.643.573 1.185.751 1.353.835.168.084.266.07.364-.042.098-.113.42-.489.532-.657.112-.168.224-.141.378-.084.154.056.979.461 1.147.545.168.084.28.126.322.197.042.07.042.411-.099.807z"/>
-                  <path d="M12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.179L2 22l4.957-1.399C8.423 21.493 10.154 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.25c-1.636 0-3.155-.494-4.431-1.341l-.318-.212-3.295.93.947-3.218-.215-.328A8.212 8.212 0 0 1 3.75 12c0-4.549 3.701-8.25 8.25-8.25 4.549 0 8.25 3.701 8.25 8.25 0 4.549-3.701 8.25-8.25 8.25z"/>
-                </svg>
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted block truncate">
-                  WhatsApp Direct
-                </span>
-                <span className="font-mono text-xs font-bold text-ink group-hover:text-[#25D366] transition-colors flex items-center gap-1 truncate">
-                  <span>+51 977 675 421</span>
                   <span className="text-[10px] opacity-60">↗</span>
                 </span>
               </div>

@@ -106,7 +106,10 @@ const DISCIPLINES: DisciplineItem[] = [
 
 export const ImpactStats: React.FC = () => {
   return (
-    <section className="relative bg-paper py-24 md:py-32 px-6 md:px-12 lg:px-16 border-t border-ink/10 selection:bg-accent/20">
+    <section
+      id="numbers"
+      className="relative bg-paper py-24 md:py-32 px-6 md:px-12 lg:px-16 border-t border-ink/10 selection:bg-accent/20"
+    >
       <div className="max-w-7xl mx-auto space-y-20">
         {/* Section Header */}
         <div className="max-w-3xl">
