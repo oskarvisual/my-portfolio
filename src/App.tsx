@@ -23,6 +23,9 @@ const IndustryStages = React.lazy(() =>
 const ImpactStats = React.lazy(() =>
   import('./components/ImpactStats').then((m) => ({ default: m.ImpactStats }))
 );
+const Games = React.lazy(() =>
+  import('./components/Games').then((m) => ({ default: m.Games }))
+);
 const Footer = React.lazy(() =>
   import('./components/Footer').then((m) => ({ default: m.Footer }))
 );
@@ -76,7 +79,10 @@ export const App: React.FC = () => {
           {/* 8. Proof in Numbers & Impact Metrics */}
           <ImpactStats />
 
-          {/* 9. Direct Contact Footer with Typewriter Email & Socials */}
+          {/* 9. My Games (3-column section before Footer) */}
+          <Games />
+
+          {/* 10. Direct Contact Footer with Typewriter Email & Socials */}
           <Footer />
         </Suspense>
       </main>

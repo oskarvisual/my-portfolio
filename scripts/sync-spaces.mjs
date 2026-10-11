@@ -177,6 +177,19 @@ async function optimizeImages() {
       console.log(`   ✅ my-presentation-v2.webp generated: ${newSz} KB`);
     }
   }
+
+  // 5. remote-live.png -> remote-live.webp (800px wide card thumbnail)
+  const remoteLivePng = path.join(imagesDir, 'remote-live.png');
+  const remoteLiveWebp = path.join(imagesDir, 'remote-live.webp');
+  if (fs.existsSync(remoteLivePng) && (!fs.existsSync(remoteLiveWebp) || fs.statSync(remoteLivePng).mtimeMs > fs.statSync(remoteLiveWebp).mtimeMs)) {
+    console.log('   Converting remote-live.png to WebP remote-live.webp (800px wide, q82, effort 6)...');
+    await sharp(remoteLivePng)
+      .resize(800, null, { fit: 'inside' })
+      .webp({ quality: 82, effort: 6 })
+      .toFile(remoteLiveWebp);
+    const newSz = (fs.statSync(remoteLiveWebp).size / 1024).toFixed(1);
+    console.log(`   ✅ remote-live.webp generated: ${newSz} KB`);
+  }
 }
 
 async function uploadImages() {
