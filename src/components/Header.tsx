@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
+const NAV_ITEMS = [
+  { label: 'Story', target: 'cart-story' },
+  { label: 'Capabilities', target: 'what-i-build' },
+  { label: 'Projects', target: 'projects' },
+  { label: 'Experience', target: 'experience' },
+  { label: 'Industries', target: 'industries' },
+  { label: 'Numbers', target: 'numbers' },
+  { label: 'Games', target: 'games' },
+  { label: 'Contact', target: 'contact' },
+];
+
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,41 +57,12 @@ export const Header: React.FC = () => {
           </span>
         </a>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-7">
-          {[
-            { label: 'Story', target: 'cart-story' },
-            { label: 'Capabilities', target: 'what-i-build' },
-            { label: 'Projects', target: 'projects' },
-            { label: 'Experience', target: 'experience' },
-            { label: 'Industries', target: 'industries' },
-            { label: 'Numbers', target: 'numbers' },
-            { label: 'Contact', target: 'contact' },
-          ].map((item) => (
-            <button
-              key={item.label}
-              onClick={() => scrollTo(item.target)}
-              className="text-xs uppercase tracking-widest text-ink-muted hover:text-ink font-mono transition-colors relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-ink hover:after:w-full after:transition-all after:duration-300"
-            >
-              {item.label}
-            </button>
-          ))}
-          <a
-            href="https://calendly.com/oscarferher"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-2 px-4 py-2 text-xs font-mono tracking-wider uppercase rounded-full border border-ink/20 hover:border-ink hover:bg-ink hover:text-paper transition-all duration-300 inline-flex items-center gap-1.5"
-          >
-            <span>Let&apos;s talk</span>
-            <span className="text-[10px]">↗</span>
-          </a>
-        </nav>
-
-        {/* Mobile Hamburger Button */}
+        {/* Hamburger Button (Visible below 1200px) */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-ink focus:outline-none"
+          className="min-[1200px]:hidden p-2 text-ink focus:outline-none"
           aria-label="Toggle navigation menu"
+          aria-expanded={mobileMenuOpen}
         >
           <div className="w-5 h-4 flex flex-col justify-between">
             <span
@@ -100,43 +82,36 @@ export const Header: React.FC = () => {
             />
           </div>
         </button>
-      </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-paper/98 backdrop-blur-xl border-b border-ink/10 px-6 py-6 space-y-4">
-          {[
-            { label: 'Story', target: 'cart-story' },
-            { label: 'Capabilities', target: 'what-i-build' },
-            { label: 'Projects', target: 'projects' },
-            { label: 'Experience', target: 'experience' },
-            { label: 'Industries', target: 'industries' },
-            { label: 'Numbers', target: 'numbers' },
-            { label: 'Contact', target: 'contact' },
-          ].map((item) => (
-            <div key={item.label}>
-              <button
-                onClick={() => scrollTo(item.target)}
-                className="w-full text-left py-2 text-sm uppercase tracking-widest font-mono text-ink hover:text-accent transition-colors"
-              >
-                {item.label}
-              </button>
-            </div>
+        {/* Single Unified Navigation Menu (Drawer below 1200px, inline horizontal bar at >= 1200px) */}
+        <nav
+          className={`${
+            mobileMenuOpen ? 'flex' : 'hidden'
+          } min-[1200px]:flex flex-col min-[1200px]:flex-row items-stretch min-[1200px]:items-center gap-4 min-[1200px]:gap-6 xl:gap-7 absolute min-[1200px]:static top-full left-0 right-0 bg-paper/98 min-[1200px]:bg-transparent backdrop-blur-xl min-[1200px]:backdrop-blur-none border-b border-ink/10 min-[1200px]:border-0 px-6 py-6 min-[1200px]:p-0 shadow-lg min-[1200px]:shadow-none`}
+        >
+          {NAV_ITEMS.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => scrollTo(item.target)}
+              className="w-full min-[1200px]:w-auto text-left min-[1200px]:text-center py-2 min-[1200px]:py-1 text-sm min-[1200px]:text-xs uppercase tracking-widest text-ink min-[1200px]:text-ink-muted hover:text-accent min-[1200px]:hover:text-ink font-mono transition-colors relative min-[1200px]:after:content-[''] min-[1200px]:after:absolute min-[1200px]:after:bottom-0 min-[1200px]:after:left-0 min-[1200px]:after:w-0 min-[1200px]:after:h-[1px] min-[1200px]:after:bg-ink min-[1200px]:hover:after:w-full min-[1200px]:after:transition-all min-[1200px]:after:duration-300"
+            >
+              {item.label}
+            </button>
           ))}
 
-          <div className="pt-3 border-t border-ink/10">
+          <div className="pt-3 border-t border-ink/10 min-[1200px]:pt-0 min-[1200px]:border-0 min-[1200px]:ml-2">
             <a
               href="https://calendly.com/oscarferher"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-3 text-xs font-mono tracking-wider uppercase rounded-full bg-ink text-paper hover:bg-accent transition-colors"
+              className="flex min-[1200px]:inline-flex items-center justify-center gap-2 min-[1200px]:gap-1.5 w-full min-[1200px]:w-auto py-3 min-[1200px]:py-2 min-[1200px]:px-4 text-xs font-mono tracking-wider uppercase rounded-full bg-ink text-paper hover:bg-accent min-[1200px]:bg-transparent min-[1200px]:text-ink min-[1200px]:border min-[1200px]:border-ink/20 min-[1200px]:hover:border-ink min-[1200px]:hover:bg-ink min-[1200px]:hover:text-paper transition-all duration-300"
             >
               <span>Let&apos;s talk</span>
-              <span className="text-sm">↗</span>
+              <span className="text-sm min-[1200px]:text-[10px]">↗</span>
             </a>
           </div>
-        </div>
-      )}
+        </nav>
+      </div>
     </header>
   );
 };
