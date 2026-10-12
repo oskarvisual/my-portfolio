@@ -200,7 +200,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
               <button
                 type="button"
                 onClick={handleOpenModal}
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#e62b1e] hover:bg-[#cc2216] text-white text-sm font-sans font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#cc2216] hover:bg-[#b91c13] text-white text-sm font-sans font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b91c13] focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
                 aria-label="View presentation video"
               >
                 <svg

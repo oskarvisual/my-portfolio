@@ -1,13 +1,17 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import cartV2Webp from '../assets/images/cart-v2.webp';
-import cartMobileV2Webp from '../assets/images/cart-mobile-v2.webp';
+import cartV3Avif from '../assets/images/cart-v3.avif';
+import cartMobileV3Avif from '../assets/images/cart-mobile-v3.avif';
+import cartV3Webp from '../assets/images/cart-v3.webp';
+import cartMobileV3Webp from '../assets/images/cart-mobile-v3.webp';
 import floorWebp from '../assets/images/floor.webp';
 import { getCdnImageUrl } from '../utils/cdn';
 
-const resolvedCartImage = getCdnImageUrl(cartV2Webp, 'cart-v2.webp');
-const resolvedCartMobile = getCdnImageUrl(cartMobileV2Webp, 'cart-mobile-v2.webp');
+const resolvedCartAvif = getCdnImageUrl(cartV3Avif, 'cart-v3.avif');
+const resolvedCartMobileAvif = getCdnImageUrl(cartMobileV3Avif, 'cart-mobile-v3.avif');
+const resolvedCartImage = getCdnImageUrl(cartV3Webp, 'cart-v3.webp');
+const resolvedCartMobile = getCdnImageUrl(cartMobileV3Webp, 'cart-mobile-v3.webp');
 const resolvedFloorImage = getCdnImageUrl(floorWebp, 'floor.webp');
 
 gsap.registerPlugin(ScrollTrigger);
@@ -384,21 +388,28 @@ export const CartStory: React.FC = () => {
             className="relative w-[195px] sm:w-[270px] md:w-[340px] lg:w-[410px] xl:w-[470px] 2xl:w-[510px] md:max-w-[85%]"
           >
             {/* Cart Top-down Image */}
-            <img
-              src={resolvedCartImage}
-              srcSet={`${resolvedCartMobile} 300w, ${resolvedCartImage} 500w`}
-              sizes="(max-width: 768px) 270px, 470px"
-              width={470}
-              height={593}
-              onError={(e) => {
-                if (e.currentTarget.src !== cartV2Webp) {
-                  e.currentTarget.src = cartV2Webp;
-                }
-              }}
-              alt="Shopping cart filled with modern technology plush mascots"
-              className="w-full h-auto object-contain block select-none pointer-events-none"
-              loading="lazy"
-            />
+            <picture>
+              <source
+                type="image/avif"
+                srcSet={`${resolvedCartMobileAvif} 300w, ${resolvedCartAvif} 500w`}
+                sizes="(max-width: 768px) 270px, 470px"
+              />
+              <img
+                src={resolvedCartImage}
+                srcSet={`${resolvedCartMobile} 300w, ${resolvedCartImage} 500w`}
+                sizes="(max-width: 768px) 270px, 470px"
+                width={500}
+                height={631}
+                onError={(e) => {
+                  if (e.currentTarget.src !== cartV3Webp) {
+                    e.currentTarget.src = cartV3Webp;
+                  }
+                }}
+                alt="Shopping cart filled with modern technology plush mascots"
+                className="w-full h-auto object-contain block select-none pointer-events-none"
+                loading="lazy"
+              />
+            </picture>
 
             {/* Mascot Slots Overlay */}
             <div

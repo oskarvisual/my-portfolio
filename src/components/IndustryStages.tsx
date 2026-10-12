@@ -142,6 +142,7 @@ export const IndustryStages: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const activeStageIndexRef = useRef(0);
   const isProgrammaticScrollRef = useRef(false);
   const programmaticTimeoutRef = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -168,7 +169,10 @@ export const IndustryStages: React.FC = () => {
             numStages - 1,
             Math.max(0, Math.floor(self.progress * numStages))
           );
-          setActiveStageIndex(idx);
+          if (idx !== activeStageIndexRef.current) {
+            activeStageIndexRef.current = idx;
+            setActiveStageIndex(idx);
+          }
         },
       });
 
@@ -394,6 +398,7 @@ export const IndustryStages: React.FC = () => {
   const handleSelectStage = (idx: number) => {
     const boundedIdx = Math.max(0, Math.min(INDUSTRY_VERTICALS.length - 1, idx));
     setMobileVideoEnded(false);
+    activeStageIndexRef.current = boundedIdx;
     setActiveStageIndex(boundedIdx);
 
     const st = scrollTriggerRef.current;

@@ -175,6 +175,7 @@ export const WhatIBuild: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLDivElement>(null);
   const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
+  const activeIdxRef = useRef(0);
   const isProgrammaticScrollRef = useRef(false);
 
   const programmaticTimeoutRef = useRef<number | null>(null);
@@ -212,10 +213,11 @@ export const WhatIBuild: React.FC = () => {
         onUpdate: (self) => {
           if (isProgrammaticScrollRef.current) return;
           const progress = self.progress;
-          if (progress < 0.25) setActiveIdx(0);
-          else if (progress < 0.5) setActiveIdx(1);
-          else if (progress < 0.75) setActiveIdx(2);
-          else setActiveIdx(3);
+          const nextIdx = progress < 0.25 ? 0 : progress < 0.5 ? 1 : progress < 0.75 ? 2 : 3;
+          if (nextIdx !== activeIdxRef.current) {
+            activeIdxRef.current = nextIdx;
+            setActiveIdx(nextIdx);
+          }
         },
       });
 
@@ -230,6 +232,7 @@ export const WhatIBuild: React.FC = () => {
   }, []);
 
   const handleSelectPanel = (idx: number) => {
+    activeIdxRef.current = idx;
     setActiveIdx(idx);
 
     const st = scrollTriggerRef.current;

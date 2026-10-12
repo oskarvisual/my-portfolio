@@ -121,32 +121,45 @@ async function optimizeImages() {
     console.log(`   ✅ floor.webp generated: ${oldSz} KB -> ${newSz} KB`);
   }
 
-  // 2. cart.png (Shopping cart with alpha) -> cart-v2.webp (desktop 500px) & cart-mobile-v2.webp (mobile 300px)
+  // 2. Versioned cart derivatives avoid stale CDN copies (1-year immutable cache).
+  // AVIF is served first; WebP remains the fallback for older browsers.
   const cartPng = path.join(imagesDir, 'cart.png');
-  const cartV2 = path.join(imagesDir, 'cart-v2.webp');
-  const cartMobileV2 = path.join(imagesDir, 'cart-mobile-v2.webp');
-  const cartWebp = path.join(imagesDir, 'cart.webp');
+  const cartV3Avif = path.join(imagesDir, 'cart-v3.avif');
+  const cartMobileV3Avif = path.join(imagesDir, 'cart-mobile-v3.avif');
+  const cartV3Webp = path.join(imagesDir, 'cart-v3.webp');
+  const cartMobileV3Webp = path.join(imagesDir, 'cart-mobile-v3.webp');
 
   if (fs.existsSync(cartPng)) {
-    if (!fs.existsSync(cartV2) || fs.statSync(cartV2).size > 120000 || fs.statSync(cartPng).mtimeMs > fs.statSync(cartV2).mtimeMs) {
-      console.log('   Converting cart.png to desktop WebP cart-v2.webp (max-w 500px, q78, effort 6)...');
+    if (!fs.existsSync(cartV3Avif) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartV3Avif).mtimeMs) {
+      console.log('   Converting cart.png to desktop AVIF cart-v3.avif (max-w 500px, q48, effort 6)...');
       await sharp(cartPng)
         .resize(500, null, { fit: 'inside' })
-        .webp({ quality: 78, effort: 6 })
-        .toFile(cartV2);
-      fs.copyFileSync(cartV2, cartWebp);
-      const newSz = (fs.statSync(cartV2).size / 1024).toFixed(1);
-      console.log(`   ✅ cart-v2.webp generated: ${newSz} KB`);
+        .avif({ quality: 48, effort: 6, chromaSubsampling: '4:2:0' })
+        .toFile(cartV3Avif);
     }
 
-    if (!fs.existsSync(cartMobileV2) || fs.statSync(cartMobileV2).size > 60000 || fs.statSync(cartPng).mtimeMs > fs.statSync(cartMobileV2).mtimeMs) {
-      console.log('   Converting cart.png to mobile WebP cart-mobile-v2.webp (max-w 300px, q78, effort 6)...');
+    if (!fs.existsSync(cartMobileV3Avif) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartMobileV3Avif).mtimeMs) {
+      console.log('   Converting cart.png to mobile AVIF cart-mobile-v3.avif (max-w 300px, q48, effort 6)...');
       await sharp(cartPng)
         .resize(300, null, { fit: 'inside' })
-        .webp({ quality: 78, effort: 6 })
-        .toFile(cartMobileV2);
-      const newSz = (fs.statSync(cartMobileV2).size / 1024).toFixed(1);
-      console.log(`   ✅ cart-mobile-v2.webp generated: ${newSz} KB`);
+        .avif({ quality: 48, effort: 6, chromaSubsampling: '4:2:0' })
+        .toFile(cartMobileV3Avif);
+    }
+
+    if (!fs.existsSync(cartV3Webp) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartV3Webp).mtimeMs) {
+      console.log('   Converting cart.png to desktop WebP cart-v3.webp (max-w 500px, q42, effort 6)...');
+      await sharp(cartPng)
+        .resize(500, null, { fit: 'inside' })
+        .webp({ quality: 42, effort: 6, smartSubsample: true })
+        .toFile(cartV3Webp);
+    }
+
+    if (!fs.existsSync(cartMobileV3Webp) || fs.statSync(cartPng).mtimeMs > fs.statSync(cartMobileV3Webp).mtimeMs) {
+      console.log('   Converting cart.png to mobile WebP cart-mobile-v3.webp (max-w 300px, q42, effort 6)...');
+      await sharp(cartPng)
+        .resize(300, null, { fit: 'inside' })
+        .webp({ quality: 42, effort: 6, smartSubsample: true })
+        .toFile(cartMobileV3Webp);
     }
   }
 
@@ -198,7 +211,7 @@ async function uploadImages() {
 
   const files = fs.readdirSync(imagesDir).filter((f) => {
     const ext = path.extname(f).toLowerCase();
-    return ['.webp', '.jpg', '.jpeg', '.png', '.svg'].includes(ext) && !f.includes('original');
+    return ['.avif', '.webp', '.jpg', '.jpeg', '.png', '.svg'].includes(ext) && !f.includes('original');
   });
 
   console.log(`\n📁 Found ${files.length} image files to sync in src/assets/images/`);
@@ -230,7 +243,8 @@ async function uploadImages() {
       const fileBuffer = fs.readFileSync(filePath);
       const ext = path.extname(file).toLowerCase();
       let contentType = 'application/octet-stream';
-      if (ext === '.webp') contentType = 'image/webp';
+      if (ext === '.avif') contentType = 'image/avif';
+      else if (ext === '.webp') contentType = 'image/webp';
       else if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
       else if (ext === '.png') contentType = 'image/png';
       else if (ext === '.svg') contentType = 'image/svg+xml';
