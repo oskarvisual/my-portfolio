@@ -1,0 +1,5 @@
+# Public portfolio: all primary content may be crawled and indexed.
+User-agent: *
+Allow: /
+
+Sitemap: https://oskarvisual.github.io/my-portfolio/sitemap.xml

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Header } from './components/Header';
@@ -33,15 +33,6 @@ const Footer = React.lazy(() =>
 gsap.registerPlugin(ScrollTrigger);
 
 export const App: React.FC = () => {
-  useEffect(() => {
-    // When dynamic chunks resolve and mount, ensure ScrollTrigger pins are recalculated precisely
-    const timer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleExploreClick = () => {
     const cartStory = document.getElementById('cart-story');
     if (cartStory) {

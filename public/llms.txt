@@ -1,0 +1,23 @@
+# Oscar Fernandez — Full-Stack Ecommerce Developer Portfolio
+
+This site presents Oscar Fernandez's work as a full-stack ecommerce engineer and systems architect. It covers ecommerce platforms, integrations, infrastructure, warehouse software, AI applications, and professional experience.
+
+## Primary links
+
+- [Portfolio home](https://oskarvisual.github.io/my-portfolio/)
+- [Resume PDF](https://oskarvisual.github.io/my-portfolio/cv.pdf)
+- [LinkedIn](https://www.linkedin.com/in/oscarfer/)
+- [Schedule a call](https://calendly.com/oscarferher)
+- [Source repository](https://github.com/oskarvisual/my-portfolio)
+
+## Topics covered
+
+- Ecommerce engineering: WooCommerce, Shopify Plus, BigCommerce, custom plugins, checkout, catalog, and search architecture.
+- Integrations and automation: APIs, webhooks, queues, ERP, ShipStation, Finale Inventory, Salesforce, n8n, and Make.
+- Infrastructure and performance: Linux, AWS, DigitalOcean, Nginx, Redis, Cloudflare, and Core Web Vitals.
+- Custom software: Python, FastAPI, React, Retool, warehouse scanning, and operational tooling.
+
+## Contact
+
+- [Email Oscar Fernandez](mailto:oskarvisual@gmail.com)
+- [WhatsApp](https://wa.me/51977675421)

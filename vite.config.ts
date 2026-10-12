@@ -1,5 +1,13 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const CRITICAL_FONT_PREFIXES = [
+  'plus-jakarta-sans-normal-400-latin-',
+  'plus-jakarta-sans-normal-800-latin-',
+  'newsreader-italic-400-latin-',
+];
 
 export default defineConfig(({ command, mode }) => {
   // During local development (npm run dev), always serve from root
@@ -28,8 +36,36 @@ export default defineConfig(({ command, mode }) => {
     base = `https://${bucket}.${region}.cdn.digitaloceanspaces.com/${projectRoot}/`;
   }
 
+  const preloadCriticalFonts = {
+    name: 'preload-critical-fonts',
+    apply: 'build' as const,
+    writeBundle(outputOptions: { dir?: string; file?: string }) {
+      const outputDir = outputOptions.dir || (outputOptions.file ? path.dirname(outputOptions.file) : 'dist');
+      const indexPath = path.join(outputDir, 'index.html');
+      const assetsDir = path.join(outputDir, 'assets');
+      if (!fs.existsSync(indexPath) || !fs.existsSync(assetsDir)) return;
+
+      const preloadLinks = fs.readdirSync(assetsDir)
+        .filter(
+          (file) =>
+            file.endsWith('.woff2') &&
+            CRITICAL_FONT_PREFIXES.some((prefix) => file.includes(prefix))
+        )
+        .map(
+          (file) =>
+            `    <link rel="preload" href="${base}assets/${file}" as="font" type="font/woff2" crossorigin="anonymous">`
+        )
+        .join('\n');
+
+      if (preloadLinks) {
+        const html = fs.readFileSync(indexPath, 'utf8');
+        fs.writeFileSync(indexPath, html.replace('</head>', `${preloadLinks}\n  </head>`));
+      }
+    },
+  };
+
   return {
-    plugins: [react()],
+    plugins: [react(), preloadCriticalFonts],
     base,
     build: {
       rollupOptions: {
