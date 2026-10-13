@@ -351,30 +351,7 @@ export const HeroPhone: React.FC<HeroPhoneProps> = ({
                   </button>
                 </div>
 
-                {/* 3. WhatsApp & Direct Phone */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  <a
-                    href="https://wa.me/51977675421?text=Hi%20Oscar%2C%20I%20saw%20your%20presentation%20video%20and%20would%20like%20to%20connect."
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
-                  >
-                    <span className="text-emerald-400">●</span>
-                    <span>WhatsApp</span>
-                    <span className="text-[8px]">↗</span>
-                  </a>
-
-                  <a
-                    href="tel:+51977675421"
-                    className="px-2 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-[9px] font-mono flex items-center justify-center gap-1 transition-colors text-white cursor-pointer"
-                  >
-                    <span>📞</span>
-                    <span>Call</span>
-                    <span className="text-[8px]">↗</span>
-                  </a>
-                </div>
-
-                {/* 4. LinkedIn & Resume */}
+                {/* 3. LinkedIn & Resume */}
                 <div className="grid grid-cols-2 gap-1.5">
                   <a
                     href="https://www.linkedin.com/in/oscarfer/"
