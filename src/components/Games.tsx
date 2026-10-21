@@ -1,4 +1,5 @@
 import React from 'react';
+import fixMyTrafficWebp from '../assets/images/fix-my-traffic.webp';
 import remoteLiveWebp from '../assets/images/remote-live.webp';
 import { getCdnImageUrl } from '../utils/cdn';
 
@@ -11,6 +12,14 @@ interface GameItem {
 }
 
 const GAMES: GameItem[] = [
+  {
+    id: 'fix-my-traffic',
+    title: 'Fix My Traffic',
+    description:
+      'Urban mobility & municipal politics simulation: modernize real-world transit corridors, dig subways, and balance budgets.',
+    url: 'https://oskarvisual.github.io/fix-my-traffic/',
+    imageSrc: getCdnImageUrl(fixMyTrafficWebp, 'fix-my-traffic.webp'),
+  },
   {
     id: 'remote-life',
     title: 'Remote Life',

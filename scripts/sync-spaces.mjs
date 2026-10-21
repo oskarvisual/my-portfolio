@@ -203,6 +203,19 @@ async function optimizeImages() {
     const newSz = (fs.statSync(remoteLiveWebp).size / 1024).toFixed(1);
     console.log(`   ✅ remote-live.webp generated: ${newSz} KB`);
   }
+
+  // 6. fix-my-traffic.png -> fix-my-traffic.webp (800px wide card thumbnail)
+  const fixTrafficPng = path.join(imagesDir, 'fix-my-traffic.png');
+  const fixTrafficWebp = path.join(imagesDir, 'fix-my-traffic.webp');
+  if (fs.existsSync(fixTrafficPng) && (!fs.existsSync(fixTrafficWebp) || fs.statSync(fixTrafficPng).mtimeMs > fs.statSync(fixTrafficWebp).mtimeMs)) {
+    console.log('   Converting fix-my-traffic.png to WebP fix-my-traffic.webp (800px wide, q82, effort 6)...');
+    await sharp(fixTrafficPng)
+      .resize(800, null, { fit: 'inside' })
+      .webp({ quality: 82, effort: 6 })
+      .toFile(fixTrafficWebp);
+    const newSz = (fs.statSync(fixTrafficWebp).size / 1024).toFixed(1);
+    console.log(`   ✅ fix-my-traffic.webp generated: ${newSz} KB`);
+  }
 }
 
 async function uploadImages() {
